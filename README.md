@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# F&E 3D — gestão de impressão 3D
 
-## Getting Started
+Next.js + Tailwind + shadcn/ui + Supabase (Auth/Storage) + Drizzle ORM.
 
-First, run the development server:
+Substitui gradualmente o app Flutter legado (`3d_printer_order`), usando o
+mesmo projeto Supabase mas em schemas novos (`core`, `crm`, `catalog`,
+`sales`) — o schema `public` do Flutter fica intocado.
+
+## Configuração
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.local.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Preencha `.env.local`:
+- `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` — mesmas do
+  projeto Supabase do app Flutter (Project Settings → API).
+- `DATABASE_URL` — connection string direta do Postgres (Project Settings →
+  Database → Connection string → URI). Necessária só no servidor, para o
+  Drizzle rodar as migrations e as queries.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Banco de dados
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run db:generate   # gera SQL a partir de db/schema/*.ts
+npm run db:push       # aplica no Postgres do Supabase (schemas core/crm/catalog/sales)
+npm run db:studio     # abre o Drizzle Studio
+```
 
-## Learn More
+A migration `db/migrations/0001_auth_integration.sql` liga `core.profiles` a
+`auth.users` e cria o trigger que gera um profile automaticamente a cada
+cadastro (primeiro usuário vira admin, os demais entram como operador).
 
-To learn more about Next.js, take a look at the following resources:
+`supabase/legacy-schema-reference.sql` é uma cópia do schema do app Flutter,
+mantida só como referência para a migração de dados futura — não é aplicada
+por este projeto.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Desenvolvimento
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev      # http://localhost:3000
+npm run build
+npm run lint
+```
 
-## Deploy on Vercel
+## Conceito do vínculo com o fatiador
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Cada linha em `catalog.filaments` representa uma bobina física. Seu `id`
+(UUID) deve ser colado no campo "Notas" do perfil de filamento no fatiador
+(Orca Slicer / Bambu Studio). Ao importar o `.gcode.3mf` num orçamento, o
+parser lê esse UUID em `filament_notes` e vincula automaticamente à bobina
+cadastrada (com fallback por cor + tipo, depois só tipo).
