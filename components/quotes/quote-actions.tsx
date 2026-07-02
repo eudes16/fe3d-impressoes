@@ -3,7 +3,7 @@
 import { useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Factory } from "lucide-react"
+import { Factory, FileText } from "lucide-react"
 
 import { confirmProduction, deleteQuote } from "@/actions/quotes"
 import { Button } from "@/components/ui/button"
@@ -23,6 +23,30 @@ export function QuoteActions({
 
   return (
     <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        render={
+          <a href={`/api/quotes/${quoteId}/pdf?variant=client`} target="_blank" rel="noreferrer" />
+        }
+      >
+        <FileText className="size-4" />
+        PDF cliente
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        render={
+          <a
+            href={`/api/quotes/${quoteId}/pdf?variant=production`}
+            target="_blank"
+            rel="noreferrer"
+          />
+        }
+      >
+        <FileText className="size-4" />
+        PDF produção
+      </Button>
       {canConfirmProduction ? (
         <Button
           type="button"

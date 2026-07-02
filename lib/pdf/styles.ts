@@ -1,0 +1,46 @@
+import { StyleSheet } from "@react-pdf/renderer"
+
+export const pdfStyles = StyleSheet.create({
+  page: { padding: 32, fontSize: 10, fontFamily: "Helvetica", color: "#111" },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    borderBottom: "2 solid #111",
+    paddingBottom: 8,
+  },
+  brand: { fontSize: 16, fontWeight: 700 },
+  docLabel: { fontSize: 10, color: "#555" },
+  thumbnail: { width: 90, height: 90, marginBottom: 12, objectFit: "cover" },
+  section: { marginBottom: 12 },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: 700,
+    marginBottom: 4,
+    textTransform: "uppercase",
+    color: "#333",
+  },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  rowLabel: { color: "#555" },
+  rowValue: { fontWeight: 500 },
+  strongRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 4,
+    paddingTop: 4,
+    borderTop: "1 solid #ccc",
+    fontWeight: 700,
+  },
+  table: { marginTop: 4 },
+  tableHeaderRow: {
+    flexDirection: "row",
+    borderBottom: "1 solid #999",
+    paddingBottom: 2,
+    marginBottom: 2,
+  },
+  tableRow: { flexDirection: "row", marginBottom: 2 },
+  colName: { flex: 3 },
+  colValue: { flex: 1, textAlign: "right" },
+  footer: { marginTop: 24, fontSize: 8, color: "#999", textAlign: "center" },
+})
