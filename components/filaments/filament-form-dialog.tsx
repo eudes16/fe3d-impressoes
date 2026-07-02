@@ -19,6 +19,16 @@ import type { filaments } from "@/db/schema"
 
 type Filament = typeof filaments.$inferSelect
 
+const CATEGORY_SUGGESTIONS = [
+  "Padrão",
+  "Silk",
+  "Dual Color",
+  "Tri Color",
+  "Quad Color",
+  "Metalic",
+  "Glow",
+]
+
 export function FilamentFormDialog({ filament }: { filament?: Filament }) {
   const action = filament
     ? updateFilament.bind(null, filament.id)
@@ -75,12 +85,27 @@ export function FilamentFormDialog({ filament }: { filament?: Filament }) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="colorHex">Cor (para casar com o .3mf)</Label>
+              <Label htmlFor="category">Categoria</Label>
               <Input
-                id="colorHex"
-                name="colorHex"
-                placeholder="#RRGGBB"
-                defaultValue={filament?.colorHex ?? ""}
+                id="category"
+                name="category"
+                list="filament-categories"
+                placeholder="Padrão, Silk, Dual Color..."
+                defaultValue={filament?.category ?? ""}
+              />
+              <datalist id="filament-categories">
+                {CATEGORY_SUGGESTIONS.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+            </div>
+            <div className="col-span-2 grid gap-2">
+              <Label htmlFor="colors">Cores (para casar com o .3mf)</Label>
+              <Input
+                id="colors"
+                name="colors"
+                placeholder="#RRGGBB, #RRGGBB (separadas por vírgula — mais de uma para silk/dual/tri/quad color)"
+                defaultValue={filament?.colors?.join(", ") ?? ""}
               />
             </div>
             <div className="grid gap-2">

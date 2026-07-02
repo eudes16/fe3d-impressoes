@@ -1,6 +1,6 @@
 {
-  "id": "782503a8-4c53-4f14-9043-b724b1451a0a",
-  "prevId": "5c590fa7-cfc9-44a3-8556-ed33dd9bc98e",
+  "id": "9ede5b82-e099-4db5-a272-09250677b041",
+  "prevId": "235effa3-a294-43ce-bcd3-3b40b58f30e8",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -300,11 +300,18 @@
           "primaryKey": false,
           "notNull": false
         },
-        "color_hex": {
-          "name": "color_hex",
+        "category": {
+          "name": "category",
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "colors": {
+          "name": "colors",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
         },
         "diameter_mm": {
           "name": "diameter_mm",

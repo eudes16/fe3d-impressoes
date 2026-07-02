@@ -124,7 +124,7 @@ export function QuoteForm({
     const matchable = filamentOptions.map((f) => ({
       id: f.id,
       name: f.name,
-      color: f.colorHex,
+      colors: f.colors,
     }))
     const working = [...form.getValues("filamentItems")]
     let unmatched = 0

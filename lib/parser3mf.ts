@@ -143,7 +143,9 @@ export async function parseGcode3mf(
 export type MatchableFilament = {
   id: string
   name: string
-  color: string | null
+  // Um filamento pode ter mais de uma cor (silk multicolor, dual/tri/quad
+  // color) — casa se QUALQUER uma bater com a cor reportada pelo slicer.
+  colors: string[]
 }
 
 /**
@@ -167,7 +169,7 @@ export function matchFilament<T extends MatchableFilament>(
 
   const byColorAndType = filaments.find(
     (f) =>
-      (f.color?.toLowerCase() ?? "") === colorLower &&
+      f.colors.some((c) => c.toLowerCase() === colorLower) &&
       f.name.toLowerCase().includes(typeLower)
   )
   if (byColorAndType) return byColorAndType

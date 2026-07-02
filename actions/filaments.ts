@@ -11,7 +11,8 @@ const filamentSchema = z.object({
   name: z.string().trim().min(1, "Informe o nome."),
   vendor: z.string().trim().optional().nullable(),
   materialType: z.string().trim().optional().nullable(),
-  colorHex: z.string().trim().optional().nullable(),
+  category: z.string().trim().optional().nullable(),
+  colors: z.array(z.string().trim().min(1)).default([]),
   diameterMm: z.coerce.number().positive(),
   price: z.coerce.number().min(0),
   weightKg: z.coerce.number().positive(),
@@ -25,11 +26,18 @@ const filamentSchema = z.object({
 export type FilamentActionState = { error?: string } | null
 
 function parseFilamentForm(formData: FormData) {
+  const colorsRaw = String(formData.get("colors") ?? "")
+  const colors = colorsRaw
+    .split(",")
+    .map((c) => c.trim())
+    .filter(Boolean)
+
   return filamentSchema.parse({
     name: formData.get("name"),
     vendor: formData.get("vendor") || null,
     materialType: formData.get("materialType") || null,
-    colorHex: formData.get("colorHex") || null,
+    category: formData.get("category") || null,
+    colors,
     diameterMm: formData.get("diameterMm"),
     price: formData.get("price"),
     weightKg: formData.get("weightKg"),

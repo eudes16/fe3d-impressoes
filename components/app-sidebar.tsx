@@ -29,7 +29,9 @@ export function AppSidebar() {
 
   return (
     <aside className="hidden w-56 shrink-0 border-r bg-sidebar text-sidebar-foreground md:flex md:flex-col">
-      <div className="flex h-14 items-center border-b px-4">
+      <div className="flex h-14 items-center gap-2 border-b px-4">
+        {/* eslint-disable-next-line @next/next/no-img-element -- SVG de 400KB, sem otimização de raster necessária */}
+        <img src="/logo.svg" alt="F&E 3D" className="size-7" />
         <span className="text-sm font-semibold">F&E 3D</span>
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-2">

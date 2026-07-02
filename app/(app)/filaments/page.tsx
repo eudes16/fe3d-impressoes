@@ -41,6 +41,7 @@ export default async function FilamentsPage() {
           <TableRow>
             <TableHead>Nome</TableHead>
             <TableHead>Fabricante / Tipo</TableHead>
+            <TableHead>Categoria / Cores</TableHead>
             <TableHead>R$/kg</TableHead>
             <TableHead>Estoque</TableHead>
             <TableHead className="w-1" />
@@ -49,7 +50,7 @@ export default async function FilamentsPage() {
         <TableBody>
           {rows.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
+              <TableCell colSpan={6} className="text-center text-muted-foreground">
                 Nenhum filamento cadastrado.
               </TableCell>
             </TableRow>
@@ -65,6 +66,25 @@ export default async function FilamentsPage() {
                     {[filament.vendor, filament.materialType]
                       .filter(Boolean)
                       .join(" · ") || "—"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {filament.category ? (
+                        <Badge variant="outline">{filament.category}</Badge>
+                      ) : null}
+                      {filament.colors.length > 0 ? (
+                        <div className="flex items-center gap-0.5">
+                          {filament.colors.map((c, i) => (
+                            <span
+                              key={i}
+                              className="size-3.5 rounded-full border"
+                              style={{ backgroundColor: c }}
+                              title={c}
+                            />
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
                   </TableCell>
                   <TableCell>
                     R$ {(filament.pricePerKg ?? 0).toFixed(2)}
