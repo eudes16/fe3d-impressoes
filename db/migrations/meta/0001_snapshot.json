@@ -1,0 +1,1082 @@
+{
+  "id": "21384926-3ed3-4538-92a9-6d93be684913",
+  "prevId": "4e5c790e-220e-4782-92fd-f819b3a6fbd1",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "core.profiles": {
+      "name": "profiles",
+      "schema": "core",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "role": {
+          "name": "role",
+          "type": "profile_role",
+          "typeSchema": "core",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'operador'"
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "core.settings": {
+      "name": "settings",
+      "schema": "core",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "energy_cost_per_kwh": {
+          "name": "energy_cost_per_kwh",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0.9
+        },
+        "labor_cost_per_hour": {
+          "name": "labor_cost_per_hour",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 30
+        },
+        "failure_rate_percent": {
+          "name": "failure_rate_percent",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 15
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'R$'"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "crm.clients": {
+      "name": "clients",
+      "schema": "crm",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "clients_created_by_profiles_id_fk": {
+          "name": "clients_created_by_profiles_id_fk",
+          "tableFrom": "clients",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "core",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "set null"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "catalog.consumables": {
+      "name": "consumables",
+      "schema": "catalog",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unit_price": {
+          "name": "unit_price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'un'"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "catalog.filaments": {
+      "name": "filaments",
+      "schema": "catalog",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vendor": {
+          "name": "vendor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "material_type": {
+          "name": "material_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "color_hex": {
+          "name": "color_hex",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "diameter_mm": {
+          "name": "diameter_mm",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1.75
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "weight_kg": {
+          "name": "weight_kg",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "density": {
+          "name": "density",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1.24
+        },
+        "nozzle_temp": {
+          "name": "nozzle_temp",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 210
+        },
+        "bed_temp": {
+          "name": "bed_temp",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 60
+        },
+        "length_m": {
+          "name": "length_m",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 330
+        },
+        "remaining_weight_g": {
+          "name": "remaining_weight_g",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "price_per_kg": {
+          "name": "price_per_kg",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "type": "stored",
+            "as": "price / NULLIF(weight_kg, 0)"
+          }
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "catalog.printers": {
+      "name": "printers",
+      "schema": "catalog",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "diameter_mm": {
+          "name": "diameter_mm",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1.75
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "depreciation_hours": {
+          "name": "depreciation_hours",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5000
+        },
+        "service_cost": {
+          "name": "service_cost",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "energy_kwh": {
+          "name": "energy_kwh",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0.12
+        },
+        "depreciation_rate": {
+          "name": "depreciation_rate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "type": "stored",
+            "as": "(price + service_cost) / NULLIF(depreciation_hours, 0)"
+          }
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "sales.quote_consumable_items": {
+      "name": "quote_consumable_items",
+      "schema": "sales",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "quote_id": {
+          "name": "quote_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "consumable_id": {
+          "name": "consumable_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "quote_consumable_items_quote_id_quotes_id_fk": {
+          "name": "quote_consumable_items_quote_id_quotes_id_fk",
+          "tableFrom": "quote_consumable_items",
+          "columnsFrom": [
+            "quote_id"
+          ],
+          "tableTo": "quotes",
+          "schemaTo": "sales",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "quote_consumable_items_consumable_id_consumables_id_fk": {
+          "name": "quote_consumable_items_consumable_id_consumables_id_fk",
+          "tableFrom": "quote_consumable_items",
+          "columnsFrom": [
+            "consumable_id"
+          ],
+          "tableTo": "consumables",
+          "schemaTo": "catalog",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "sales.quote_filament_items": {
+      "name": "quote_filament_items",
+      "schema": "sales",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "quote_id": {
+          "name": "quote_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "filament_id": {
+          "name": "filament_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight_g": {
+          "name": "weight_g",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "quote_filament_items_quote_id_quotes_id_fk": {
+          "name": "quote_filament_items_quote_id_quotes_id_fk",
+          "tableFrom": "quote_filament_items",
+          "columnsFrom": [
+            "quote_id"
+          ],
+          "tableTo": "quotes",
+          "schemaTo": "sales",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "quote_filament_items_filament_id_filaments_id_fk": {
+          "name": "quote_filament_items_filament_id_filaments_id_fk",
+          "tableFrom": "quote_filament_items",
+          "columnsFrom": [
+            "filament_id"
+          ],
+          "tableTo": "filaments",
+          "schemaTo": "catalog",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "sales.quote_plate_items": {
+      "name": "quote_plate_items",
+      "schema": "sales",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "quote_id": {
+          "name": "quote_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "print_time_h": {
+          "name": "print_time_h",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "weight_g": {
+          "name": "weight_g",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "quote_plate_items_quote_id_quotes_id_fk": {
+          "name": "quote_plate_items_quote_id_quotes_id_fk",
+          "tableFrom": "quote_plate_items",
+          "columnsFrom": [
+            "quote_id"
+          ],
+          "tableTo": "quotes",
+          "schemaTo": "sales",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "sales.quotes": {
+      "name": "quotes",
+      "schema": "sales",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "printer_id": {
+          "name": "printer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "print_time_h": {
+          "name": "print_time_h",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "prep_time_min": {
+          "name": "prep_time_min",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "slicing_time_min": {
+          "name": "slicing_time_min",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "material_change_min": {
+          "name": "material_change_min",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "transfer_start_min": {
+          "name": "transfer_start_min",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "removal_min": {
+          "name": "removal_min",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "support_removal_min": {
+          "name": "support_removal_min",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "additional_work_min": {
+          "name": "additional_work_min",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "consumables_misc_cost": {
+          "name": "consumables_misc_cost",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "markup_percent": {
+          "name": "markup_percent",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 100
+        },
+        "real_price": {
+          "name": "real_price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "status": {
+          "name": "status",
+          "type": "quote_status",
+          "typeSchema": "sales",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'draft'"
+        },
+        "thumbnail_url": {
+          "name": "thumbnail_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "model_name": {
+          "name": "model_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_3mf_filename": {
+          "name": "source_3mf_filename",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "assigned_user_id": {
+          "name": "assigned_user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "quotes_client_id_clients_id_fk": {
+          "name": "quotes_client_id_clients_id_fk",
+          "tableFrom": "quotes",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "tableTo": "clients",
+          "schemaTo": "crm",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "set null"
+        },
+        "quotes_printer_id_printers_id_fk": {
+          "name": "quotes_printer_id_printers_id_fk",
+          "tableFrom": "quotes",
+          "columnsFrom": [
+            "printer_id"
+          ],
+          "tableTo": "printers",
+          "schemaTo": "catalog",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "quotes_assigned_user_id_profiles_id_fk": {
+          "name": "quotes_assigned_user_id_profiles_id_fk",
+          "tableFrom": "quotes",
+          "columnsFrom": [
+            "assigned_user_id"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "core",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "set null"
+        },
+        "quotes_created_by_profiles_id_fk": {
+          "name": "quotes_created_by_profiles_id_fk",
+          "tableFrom": "quotes",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "core",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "set null"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "sales.stock_movements": {
+      "name": "stock_movements",
+      "schema": "sales",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "item_type": {
+          "name": "item_type",
+          "type": "stock_item_type",
+          "typeSchema": "sales",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "filament_id": {
+          "name": "filament_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consumable_id": {
+          "name": "consumable_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quote_id": {
+          "name": "quote_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "delta_qty": {
+          "name": "delta_qty",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'quote_production'"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "stock_movements_filament_id_filaments_id_fk": {
+          "name": "stock_movements_filament_id_filaments_id_fk",
+          "tableFrom": "stock_movements",
+          "columnsFrom": [
+            "filament_id"
+          ],
+          "tableTo": "filaments",
+          "schemaTo": "catalog",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "stock_movements_consumable_id_consumables_id_fk": {
+          "name": "stock_movements_consumable_id_consumables_id_fk",
+          "tableFrom": "stock_movements",
+          "columnsFrom": [
+            "consumable_id"
+          ],
+          "tableTo": "consumables",
+          "schemaTo": "catalog",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "stock_movements_quote_id_quotes_id_fk": {
+          "name": "stock_movements_quote_id_quotes_id_fk",
+          "tableFrom": "stock_movements",
+          "columnsFrom": [
+            "quote_id"
+          ],
+          "tableTo": "quotes",
+          "schemaTo": "sales",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "set null"
+        },
+        "stock_movements_created_by_profiles_id_fk": {
+          "name": "stock_movements_created_by_profiles_id_fk",
+          "tableFrom": "stock_movements",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "core",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "set null"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "core.profile_role": {
+      "name": "profile_role",
+      "schema": "core",
+      "values": [
+        "admin",
+        "operador"
+      ]
+    },
+    "sales.quote_status": {
+      "name": "quote_status",
+      "schema": "sales",
+      "values": [
+        "draft",
+        "sent",
+        "approved",
+        "in_production",
+        "completed",
+        "rejected"
+      ]
+    },
+    "sales.stock_item_type": {
+      "name": "stock_item_type",
+      "schema": "sales",
+      "values": [
+        "filament",
+        "consumable"
+      ]
+    }
+  },
+  "schemas": {
+    "core": "core",
+    "crm": "crm",
+    "catalog": "catalog",
+    "sales": "sales"
+  },
+  "views": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
