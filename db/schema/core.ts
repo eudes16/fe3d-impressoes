@@ -12,6 +12,9 @@ export const profileRoleEnum = core.enum("profile_role", [
 export const profiles = core.table("profiles", {
   id: uuid("id").primaryKey(),
   name: text("name").notNull().default(""),
+  // Espelhado de auth.users.email pelo trigger (evita depender da service_role
+  // key só para listar usuários na tela de papéis).
+  email: text("email").notNull().default(""),
   role: profileRoleEnum("role").notNull().default("operador"),
   phone: text("phone"),
   createdAt: timestamp("created_at", { withTimezone: true })

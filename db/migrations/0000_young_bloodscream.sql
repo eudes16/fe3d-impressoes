@@ -12,6 +12,7 @@ CREATE TYPE "sales"."stock_item_type" AS ENUM('filament', 'consumable');--> stat
 CREATE TABLE "core"."profiles" (
 	"id" uuid PRIMARY KEY NOT NULL,
 	"name" text DEFAULT '' NOT NULL,
+	"email" text DEFAULT '' NOT NULL,
 	"role" "core"."profile_role" DEFAULT 'operador' NOT NULL,
 	"phone" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
@@ -55,7 +56,6 @@ CREATE TABLE "catalog"."filaments" (
 	"name" text NOT NULL,
 	"vendor" text,
 	"material_type" text,
-	"color" text,
 	"color_hex" text,
 	"diameter_mm" numeric DEFAULT 1.75 NOT NULL,
 	"price" numeric DEFAULT 0 NOT NULL,

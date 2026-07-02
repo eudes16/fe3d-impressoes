@@ -1,5 +1,5 @@
 {
-  "id": "4e5c790e-220e-4782-92fd-f819b3a6fbd1",
+  "id": "5c590fa7-cfc9-44a3-8556-ed33dd9bc98e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -16,6 +16,13 @@
         },
         "name": {
           "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "email": {
+          "name": "email",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -289,12 +296,6 @@
         },
         "material_type": {
           "name": "material_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "color": {
-          "name": "color",
           "type": "text",
           "primaryKey": false,
           "notNull": false

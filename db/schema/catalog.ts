@@ -36,7 +36,7 @@ export const filaments = catalog.table("filaments", {
   name: text("name").notNull(),
   vendor: text("vendor"),
   materialType: text("material_type"),
-  color: text("color"),
+  // hex ou nome de cor — comparado com o colorHex do .3mf no matching automático.
   colorHex: text("color_hex"),
   diameterMm: numeric("diameter_mm", { mode: "number" })
     .notNull()

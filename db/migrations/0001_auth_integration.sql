@@ -8,7 +8,8 @@ ALTER TABLE "core"."profiles"
 --> statement-breakpoint
 
 -- O primeiro usuário a se cadastrar vira admin automaticamente; os demais
--- entram como operador (um admin promove depois em /settings).
+-- entram como operador (um admin promove depois em /settings). O e-mail é
+-- espelhado de auth.users para não depender da service_role key na UI.
 CREATE OR REPLACE FUNCTION core.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -16,10 +17,11 @@ SECURITY DEFINER
 SET search_path = core, public
 AS $$
 BEGIN
-  INSERT INTO core.profiles (id, name, role)
+  INSERT INTO core.profiles (id, name, email, role)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'name', ''),
+    COALESCE(NEW.email, ''),
     CASE WHEN EXISTS (SELECT 1 FROM core.profiles) THEN 'operador' ELSE 'admin' END
   )
   ON CONFLICT (id) DO NOTHING;
