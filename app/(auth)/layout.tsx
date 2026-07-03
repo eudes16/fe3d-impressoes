@@ -9,10 +9,10 @@ export default function AuthLayout({
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--chart-1),transparent_85%),transparent),radial-gradient(50%_40%_at_100%_100%,color-mix(in_oklch,var(--chart-2),transparent_88%),transparent)]"
       />
-      <div className="relative flex size-20 items-center justify-center">
+      <div className="relative flex size-64 items-center justify-center">
         <div className="absolute inset-0 rounded-full bg-primary/15 blur-xl" />
         {/* eslint-disable-next-line @next/next/no-img-element -- SVG de 400KB, sem otimização de raster necessária */}
-        <img src="/logo.svg" alt="F&E 3D" className="relative size-16" />
+        <img src="/logo.svg" alt="F&E 3D" className="relative size-64" />
       </div>
       <div className="w-full max-w-sm">{children}</div>
     </div>

@@ -29,13 +29,13 @@ export function AppSidebar() {
 
   return (
     <aside className="hidden w-56 shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex md:flex-col">
-      <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
-        <div className="relative flex size-8 items-center justify-center">
+      <div className="flex h-14 items-center justify-center gap-2.5 border-b border-sidebar-border px-4">
+        <div className="relative flex size-24 items-center justify-center">
           <div className="absolute inset-0 rounded-full bg-primary/15 blur-md" />
           {/* eslint-disable-next-line @next/next/no-img-element -- SVG de 400KB, sem otimização de raster necessária */}
-          <img src="/logo.svg" alt="F&E 3D" className="relative size-7" />
+          <img src="/logo.svg" alt="F&E 3D" className="relative size-24" />
         </div>
-        <span className="text-sm font-semibold tracking-tight">F&E 3D</span>
+        
       </div>
       <nav className="flex flex-1 flex-col gap-0.5 p-2">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
