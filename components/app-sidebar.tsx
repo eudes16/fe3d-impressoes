@@ -48,12 +48,12 @@ export function AppSidebar() {
               className={cn(
                 "relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150",
                 active
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary/12 text-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               {active ? (
-                <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-primary" />
+                <span className="absolute inset-y-1.5 left-0 w-1 rounded-full bg-[linear-gradient(180deg,var(--brand-gradient-from),var(--brand-gradient-to))]" />
               ) : null}
               <Icon className="size-4" />
               {label}
