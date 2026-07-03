@@ -28,13 +28,16 @@ export function AppSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden w-56 shrink-0 border-r bg-sidebar text-sidebar-foreground md:flex md:flex-col">
-      <div className="flex h-14 items-center gap-2 border-b px-4">
-        {/* eslint-disable-next-line @next/next/no-img-element -- SVG de 400KB, sem otimização de raster necessária */}
-        <img src="/logo.svg" alt="F&E 3D" className="size-7" />
-        <span className="text-sm font-semibold">F&E 3D</span>
+    <aside className="hidden w-56 shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex md:flex-col">
+      <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
+        <div className="relative flex size-8 items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-primary/15 blur-md" />
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG de 400KB, sem otimização de raster necessária */}
+          <img src="/logo.svg" alt="F&E 3D" className="relative size-7" />
+        </div>
+        <span className="text-sm font-semibold tracking-tight">F&E 3D</span>
       </div>
-      <nav className="flex flex-1 flex-col gap-1 p-2">
+      <nav className="flex flex-1 flex-col gap-0.5 p-2">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active =
             pathname === href || pathname.startsWith(`${href}/`)
@@ -43,12 +46,15 @@ export function AppSidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150",
                 active
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
+              {active ? (
+                <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-primary" />
+              ) : null}
               <Icon className="size-4" />
               {label}
             </Link>

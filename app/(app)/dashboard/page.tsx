@@ -15,6 +15,15 @@ import { Badge } from "@/components/ui/badge"
 
 const LOW_STOCK_RATIO = 0.15
 
+const STATUS_ACCENT: Record<string, string> = {
+  draft: "var(--chart-5)",
+  sent: "var(--chart-2)",
+  approved: "var(--chart-1)",
+  in_production: "var(--chart-1)",
+  completed: "var(--chart-3)",
+  rejected: "var(--destructive)",
+}
+
 export default async function DashboardPage() {
   const [allFilaments, allConsumables, statusCounts, recentQuotes] = await Promise.all([
     db.select().from(filaments),
@@ -42,10 +51,14 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {quoteStatusValues.map((status) => (
-          <Card key={status}>
+          <Card
+            key={status}
+            className="border-t-2"
+            style={{ borderTopColor: STATUS_ACCENT[status] }}
+          >
             <CardHeader className="pb-2">
               <CardDescription>{quoteStatusLabels[status]}</CardDescription>
-              <CardTitle className="text-2xl">
+              <CardTitle className="text-2xl tabular-nums">
                 {countByStatus.get(status) ?? 0}
               </CardTitle>
             </CardHeader>
