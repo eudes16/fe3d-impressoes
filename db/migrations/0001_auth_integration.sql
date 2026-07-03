@@ -40,3 +40,27 @@ CREATE TRIGGER on_auth_user_created_core_profile
 
 -- Garante que sempre exista exatamente uma linha de configurações.
 INSERT INTO "core"."settings" DEFAULT VALUES;
+--> statement-breakpoint
+
+-- Backfill: usuários que já existiam em auth.users ANTES desta migration
+-- (ex.: contas criadas pelo app Flutter legado no mesmo projeto Supabase)
+-- nunca disparam o trigger acima, então ficariam sem linha em core.profiles.
+-- O mais antigo vira admin (só se core.profiles ainda estiver vazio), os
+-- demais entram como operador — mesma regra do trigger.
+WITH ordered AS (
+  SELECT u.id, u.raw_user_meta_data, u.email, u.created_at,
+         ROW_NUMBER() OVER (ORDER BY u.created_at) AS rn
+  FROM auth.users u
+  WHERE NOT EXISTS (SELECT 1 FROM core.profiles p WHERE p.id = u.id)
+)
+INSERT INTO core.profiles (id, name, email, role)
+SELECT
+  o.id,
+  COALESCE(o.raw_user_meta_data->>'name', ''),
+  COALESCE(o.email, ''),
+  CASE
+    WHEN NOT EXISTS (SELECT 1 FROM core.profiles) AND o.rn = 1 THEN 'admin'
+    ELSE 'operador'
+  END
+FROM ordered o
+ON CONFLICT (id) DO NOTHING;
