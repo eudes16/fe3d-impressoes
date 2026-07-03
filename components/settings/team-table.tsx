@@ -73,7 +73,11 @@ export function TeamTable({
                 disabled={pending}
               >
                 <SelectTrigger size="sm">
-                  <SelectValue />
+                  <SelectValue>
+                    {(value: "admin" | "operador") =>
+                      value === "admin" ? "Administrador" : "Operador"
+                    }
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Administrador</SelectItem>

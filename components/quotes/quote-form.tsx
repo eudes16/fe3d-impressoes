@@ -60,6 +60,19 @@ function matchPrinter(printerModel: string, options: PrinterOption[]) {
   return best
 }
 
+// Base UI's Select.Value não deduz o rótulo a partir dos SelectItem
+// renderizados (diferente do Radix) — precisa de uma função explícita
+// value -> ReactNode. "MARCA - CATEGORIA - COR" quando disponível, senão
+// cai pro nome cadastrado.
+function filamentLabel(f: FilamentOption) {
+  const parts = [f.vendor, f.category, f.colors[0]].filter(Boolean)
+  return parts.length > 0 ? parts.join(" - ") : f.name
+}
+
+function consumableLabel(c: ConsumableOption) {
+  return c.category ? `${c.category} - ${c.name}` : c.name
+}
+
 export function QuoteForm({
   quoteId,
   defaultValues,
@@ -249,7 +262,12 @@ export function QuoteForm({
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione" />
+                        <SelectValue>
+                          {(value: string) =>
+                            printerOptions.find((p) => p.id === value)?.name ??
+                            "Selecione"
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {printerOptions.map((p) => (
@@ -276,7 +294,11 @@ export function QuoteForm({
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
-                        <SelectValue />
+                        <SelectValue>
+                          {(value: keyof typeof quoteStatusLabels) =>
+                            quoteStatusLabels[value] ?? value
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {quoteStatusValues.map((s) => (
@@ -301,7 +323,13 @@ export function QuoteForm({
                       onValueChange={(v) => field.onChange(v === NONE ? null : v)}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Nenhum" />
+                        <SelectValue>
+                          {(value: string) =>
+                            value === NONE || !value
+                              ? "Nenhum"
+                              : (clients.find((c) => c.id === value)?.name ?? "Nenhum")
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value={NONE}>Nenhum</SelectItem>
@@ -327,7 +355,13 @@ export function QuoteForm({
                       onValueChange={(v) => field.onChange(v === NONE ? null : v)}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Nenhum" />
+                        <SelectValue>
+                          {(value: string) =>
+                            value === NONE || !value
+                              ? "Nenhum"
+                              : (teamOptions.find((t) => t.id === value)?.name ?? "Nenhum")
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value={NONE}>Nenhum</SelectItem>
@@ -384,12 +418,17 @@ export function QuoteForm({
                           render={({ field: f }) => (
                             <Select value={f.value} onValueChange={f.onChange}>
                               <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Selecione" />
+                                <SelectValue>
+                                  {(value: string) => {
+                                    const opt = filamentOptions.find((o) => o.id === value)
+                                    return opt ? filamentLabel(opt) : "Selecione"
+                                  }}
+                                </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
                                 {filamentOptions.map((opt) => (
                                   <SelectItem key={opt.id} value={opt.id}>
-                                    {opt.name}
+                                    {filamentLabel(opt)}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -468,12 +507,17 @@ export function QuoteForm({
                           render={({ field: f }) => (
                             <Select value={f.value} onValueChange={f.onChange}>
                               <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Selecione" />
+                                <SelectValue>
+                                  {(value: string) => {
+                                    const opt = consumableOptions.find((o) => o.id === value)
+                                    return opt ? consumableLabel(opt) : "Selecione"
+                                  }}
+                                </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
                                 {consumableOptions.map((opt) => (
                                   <SelectItem key={opt.id} value={opt.id}>
-                                    {opt.name}
+                                    {consumableLabel(opt)}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
