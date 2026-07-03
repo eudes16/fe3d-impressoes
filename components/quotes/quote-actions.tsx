@@ -26,6 +26,7 @@ export function QuoteActions({
       <Button
         variant="outline"
         size="sm"
+        nativeButton={false}
         render={
           <a href={`/api/quotes/${quoteId}/pdf?variant=client`} target="_blank" rel="noreferrer" />
         }
@@ -36,6 +37,7 @@ export function QuoteActions({
       <Button
         variant="outline"
         size="sm"
+        nativeButton={false}
         render={
           <a
             href={`/api/quotes/${quoteId}/pdf?variant=production`}

@@ -48,7 +48,7 @@ export default async function QuotesPage() {
             Importe o .3mf do fatiador para preencher automaticamente.
           </p>
         </div>
-        <Button size="sm" render={<Link href="/quotes/new" />}>
+        <Button size="sm" nativeButton={false} render={<Link href="/quotes/new" />}>
           <Plus className="size-4" />
           Novo orçamento
         </Button>
