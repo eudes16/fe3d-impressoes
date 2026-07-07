@@ -6,7 +6,7 @@ export function filamentLabel(f: {
   colors: string[]
   name: string
 }) {
-  const parts = [f.vendor, f.category, f.colors[0]].filter(Boolean)
+  const parts = [f.name, f.vendor, f.category, f.colors[0]].filter(Boolean)
   return parts.length > 0 ? parts.join(" - ") : f.name
 }
 

@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { Check } from "lucide-react"
 
 import {
@@ -34,10 +35,18 @@ type FilamentOption = typeof filaments.$inferSelect
 
 const SKIP = "__skip__"
 
+// three.js/@react-three/fiber usa WebGL — precisa ficar fora de qualquer
+// tentativa de SSR.
+const ThreeMfViewer = dynamic(
+  () => import("@/components/quotes/three-mf-viewer").then((m) => m.ThreeMfViewer),
+  { ssr: false }
+)
+
 export type PendingImport = {
   data: SliceData
   filename: string
   mapping: (string | null)[]
+  buffer: ArrayBuffer
 }
 
 // O perfil de filamento no fatiador é por marca+tipo, não por cor — o
@@ -64,7 +73,7 @@ export function Import3mfDialog({
         if (!open) onCancel()
       }}
     >
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-h-[90vh] max-w-3xl min-w-md overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Confirmar filamentos do .3mf</DialogTitle>
           <DialogDescription>
@@ -72,6 +81,8 @@ export function Import3mfDialog({
             vínculo de cada filamento antes de importar.
           </DialogDescription>
         </DialogHeader>
+
+        {pending ? <ThreeMfViewer buffer={pending.buffer} /> : null}
 
         {pending ? (
           <Table>

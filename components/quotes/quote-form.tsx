@@ -122,7 +122,7 @@ export function QuoteForm({
       colors: f.colors,
     }))
     const mapping = data.filaments.map((sf) => matchFilament(sf, matchable)?.id ?? null)
-    setPendingImport({ data, filename: file.name, mapping })
+    setPendingImport({ data, filename: file.name, mapping, buffer })
   }
 
   function updateImportMapping(index: number, filamentId: string | null) {
