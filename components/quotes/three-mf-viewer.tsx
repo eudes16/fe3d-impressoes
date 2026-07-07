@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo } from "react"
 import { Canvas } from "@react-three/fiber"
-import { Bounds, OrbitControls } from "@react-three/drei"
+import { OrbitControls, Stage } from "@react-three/drei"
 import { ThreeMFLoader } from "three/examples/jsm/loaders/3MFLoader.js"
 import * as THREE from "three"
 
@@ -13,9 +13,18 @@ function Model({ buffer }: { buffer: ArrayBuffer }) {
   const group = useMemo(() => {
     const loader = new ThreeMFLoader()
     const parsed = loader.parse(buffer)
+    // O .3mf normalmente não traz material/cor útil pro preview — força um
+    // material padrão que reage à luz (senão fica escuro/invisível sob a
+    // iluminação fisicamente correta do three.js recente).
     parsed.traverse((child) => {
-      if (child instanceof THREE.Mesh && !child.material) {
-        child.material = new THREE.MeshStandardMaterial({ color: "#9aa0c9" })
+      if (child instanceof THREE.Mesh) {
+        child.material = new THREE.MeshStandardMaterial({
+          color: "#c7cbe8",
+          roughness: 0.45,
+          metalness: 0.1,
+        })
+        child.castShadow = true
+        child.receiveShadow = true
       }
     })
     return parsed
@@ -27,14 +36,11 @@ function Model({ buffer }: { buffer: ArrayBuffer }) {
 export function ThreeMfViewer({ buffer }: { buffer: ArrayBuffer }) {
   return (
     <div className="h-72 w-full overflow-hidden rounded-lg border bg-muted/30">
-      <Canvas camera={{ position: [1, 1, 1], fov: 45 }}>
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[5, 10, 7]} intensity={1.2} />
-        <directionalLight position={[-5, -5, -5]} intensity={0.4} />
+      <Canvas shadows camera={{ position: [3, 3, 3], fov: 45 }}>
         <Suspense fallback={null}>
-          <Bounds fit clip observe margin={1.3}>
+          <Stage adjustCamera intensity={0.6} environment="city" shadows="contact">
             <Model buffer={buffer} />
-          </Bounds>
+          </Stage>
         </Suspense>
         <OrbitControls makeDefault enableDamping />
       </Canvas>
