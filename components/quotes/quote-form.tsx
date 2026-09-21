@@ -10,6 +10,7 @@ import Image from "next/image"
 
 import { saveQuote } from "@/actions/quotes"
 import { parseGcode3mf, matchFilament } from "@/lib/parser3mf"
+import { parseGcode } from "@/lib/parserGcode"
 import { filamentLabel, consumableLabel } from "@/lib/filament-label"
 import {
   quoteFormSchema,
@@ -111,7 +112,8 @@ export function QuoteForm({
   // aplicada ao formulário.
   async function handleImportFile(file: File) {
     const buffer = await file.arrayBuffer()
-    const data = await parseGcode3mf(buffer)
+    const isGcode = file.name.toLowerCase().endsWith(".gcode")
+    const data = isGcode ? parseGcode(buffer, file.name) : await parseGcode3mf(buffer)
     if (!data) {
       toast.error("Arquivo inválido ou sem metadados de fatiamento.")
       return
@@ -122,7 +124,13 @@ export function QuoteForm({
       colors: f.colors,
     }))
     const mapping = data.filaments.map((sf) => matchFilament(sf, matchable)?.id ?? null)
-    setPendingImport({ data, filename: file.name, mapping, buffer })
+    setPendingImport({
+      data,
+      filename: file.name,
+      mapping,
+      buffer,
+      source: isGcode ? "gcode" : "3mf",
+    })
   }
 
   function updateImportMapping(index: number, filamentId: string | null) {
@@ -221,7 +229,7 @@ export function QuoteForm({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".3mf"
+                  accept=".3mf,.gcode"
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0]
@@ -236,7 +244,7 @@ export function QuoteForm({
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload className="size-4" />
-                  Importar .3mf
+                  Importar .3mf / .gcode
                 </Button>
               </div>
             </CardHeader>
@@ -568,7 +576,7 @@ export function QuoteForm({
           {plateFields.fields.length > 0 ? (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Pratos (do .3mf)</CardTitle>
+                <CardTitle className="text-base">Pratos (importados)</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>

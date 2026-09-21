@@ -1,7 +1,9 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
-const PUBLIC_PATHS = ["/login", "/register"]
+// Cadastro deixou de ser uma rota pública — agora só é possível criar acesso
+// de dentro do app, em Configurações > Equipe (admin only).
+const PUBLIC_PATHS = ["/login"]
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })

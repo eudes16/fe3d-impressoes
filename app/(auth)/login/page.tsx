@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { useActionState } from "react"
 
 import { signIn } from "@/actions/auth"
@@ -39,16 +38,10 @@ export default function LoginPage() {
             <p className="text-sm text-destructive">{state.error}</p>
           ) : null}
         </CardContent>
-        <CardFooter className="flex flex-col gap-3">
+        <CardFooter>
           <Button type="submit" className="w-full" disabled={pending}>
             {pending ? "Entrando..." : "Entrar"}
           </Button>
-          <p className="text-sm text-muted-foreground">
-            Ainda não tem conta?{" "}
-            <Link href="/register" className="text-primary underline">
-              Criar conta
-            </Link>
-          </p>
         </CardFooter>
       </form>
     </Card>

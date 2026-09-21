@@ -100,7 +100,7 @@ export function FilamentFormDialog({ filament }: { filament?: Filament }) {
               </datalist>
             </div>
             <div className="col-span-2 grid gap-2">
-              <Label htmlFor="colors">Cores (para casar com o .3mf)</Label>
+              <Label htmlFor="colors">Cores (para casar com o .3mf/.gcode)</Label>
               <Input
                 id="colors"
                 name="colors"

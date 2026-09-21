@@ -40,7 +40,7 @@ export const filaments = catalog.table("filaments", {
   // "Glow" — livre, sem enum fechado (lista sugerida só na UI).
   category: text("category"),
   // Um filamento pode ter mais de uma cor (silk multicolor, dual/tri/quad
-  // color etc.) — cada uma é comparada com o colorHex do .3mf no matching.
+  // color etc.) — cada uma é comparada com o colorHex do .3mf/.gcode no matching.
   colors: text("colors").array().notNull().default([]),
   diameterMm: numeric("diameter_mm", { mode: "number" })
     .notNull()

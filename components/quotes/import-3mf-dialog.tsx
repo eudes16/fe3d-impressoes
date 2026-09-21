@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import Image from "next/image"
 import { Check } from "lucide-react"
 
 import {
@@ -47,6 +48,10 @@ export type PendingImport = {
   filename: string
   mapping: (string | null)[]
   buffer: ArrayBuffer
+  // O .3mf carrega a malha (visualizada em 3D via ThreeMfViewer); o .gcode
+  // puro não tem geometria, então o preview cai pro thumbnail embutido nos
+  // comentários do fatiador.
+  source: "3mf" | "gcode"
 }
 
 // O perfil de filamento no fatiador é por marca+tipo, não por cor — o
@@ -75,14 +80,27 @@ export function Import3mfDialog({
     >
       <DialogContent className="max-h-[90vh] max-w-3xl min-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Confirmar filamentos do .3mf</DialogTitle>
+          <DialogTitle>Confirmar filamentos do arquivo importado</DialogTitle>
           <DialogDescription>
             O fatiador não identifica a bobina exata — confira ou troque o
             vínculo de cada filamento antes de importar.
           </DialogDescription>
         </DialogHeader>
 
-        {pending ? <ThreeMfViewer buffer={pending.buffer} /> : null}
+        {pending?.source === "3mf" ? (
+          <ThreeMfViewer buffer={pending.buffer} />
+        ) : null}
+
+        {pending?.source === "gcode" && pending.data.thumbnailBase64 ? (
+          <Image
+            src={`data:image/png;base64,${pending.data.thumbnailBase64}`}
+            alt="Prévia do modelo"
+            width={260}
+            height={260}
+            unoptimized
+            className="mx-auto rounded-md border object-contain"
+          />
+        ) : null}
 
         {pending ? (
           <Table>

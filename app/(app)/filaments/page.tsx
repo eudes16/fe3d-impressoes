@@ -30,7 +30,7 @@ export default async function FilamentsPage() {
           <h1 className="text-2xl font-semibold">Filamentos</h1>
           <p className="text-muted-foreground">
             Cada linha é uma bobina física — cole o UUID (id) nas notas do
-            filamento no fatiador para vincular ao importar o .3mf.
+            filamento no fatiador para vincular ao importar o .3mf/.gcode.
           </p>
         </div>
         <FilamentFormDialog />

@@ -18,6 +18,9 @@ Preencha `.env.local`:
 - `DATABASE_URL` — connection string direta do Postgres (Project Settings →
   Database → Connection string → URI). Necessária só no servidor, para o
   Drizzle rodar as migrations e as queries.
+- `SUPABASE_SERVICE_ROLE_KEY` — Project Settings → API → service_role.
+  Necessária para criar membros da equipe (Configurações → Equipe); não tem
+  prefixo `NEXT_PUBLIC_` porque só é usada no servidor.
 
 ## Banco de dados
 
@@ -30,6 +33,10 @@ npm run db:studio     # abre o Drizzle Studio
 A migration `db/migrations/0001_auth_integration.sql` liga `core.profiles` a
 `auth.users` e cria o trigger que gera um profile automaticamente a cada
 cadastro (primeiro usuário vira admin, os demais entram como operador).
+
+Não há mais cadastro público — um admin logado cria o acesso de cada membro
+da equipe em Configurações → Equipe (usa a Admin API do Supabase com a
+`SUPABASE_SERVICE_ROLE_KEY`, já entrega a senha inicial que o admin definiu).
 
 `supabase/legacy-schema-reference.sql` é uma cópia do schema do app Flutter,
 mantida só como referência para a migração de dados futura — não é aplicada
@@ -47,6 +54,7 @@ npm run lint
 
 Cada linha em `catalog.filaments` representa uma bobina física. Seu `id`
 (UUID) deve ser colado no campo "Notas" do perfil de filamento no fatiador
-(Orca Slicer / Bambu Studio). Ao importar o `.gcode.3mf` num orçamento, o
-parser lê esse UUID em `filament_notes` e vincula automaticamente à bobina
-cadastrada (com fallback por cor + tipo, depois só tipo).
+(Orca Slicer / Bambu Studio / Creality Print). Ao importar o `.gcode.3mf`
+ou o `.gcode` num orçamento, o parser lê esse UUID em `filament_notes` e
+vincula automaticamente à bobina cadastrada (com fallback por cor + tipo,
+depois só tipo).

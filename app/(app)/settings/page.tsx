@@ -5,6 +5,7 @@ import { requireProfile } from "@/lib/current-user"
 import { SettingsForm } from "@/components/settings/settings-form"
 import { ProfileForm } from "@/components/settings/profile-form"
 import { TeamTable } from "@/components/settings/team-table"
+import { AddTeamMemberDialog } from "@/components/settings/add-team-member-dialog"
 import {
   Card,
   CardContent,
@@ -61,11 +62,15 @@ export default async function SettingsPage() {
 
       {team ? (
         <Card>
-          <CardHeader>
-            <CardTitle>Equipe</CardTitle>
-            <CardDescription>
-              Só administradores podem alterar papéis de outros usuários.
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Equipe</CardTitle>
+              <CardDescription>
+                Só administradores podem criar acessos e alterar papéis de
+                outros usuários.
+              </CardDescription>
+            </div>
+            <AddTeamMemberDialog />
           </CardHeader>
           <CardContent>
             <TeamTable members={team} currentUserId={profile.id} />

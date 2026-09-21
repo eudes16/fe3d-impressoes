@@ -45,7 +45,7 @@ export default async function QuotesPage() {
         <div>
           <h1 className="text-2xl font-semibold">Orçamentos</h1>
           <p className="text-muted-foreground">
-            Importe o .3mf do fatiador para preencher automaticamente.
+            Importe o .3mf ou .gcode do fatiador para preencher automaticamente.
           </p>
         </div>
         <Button size="sm" nativeButton={false} render={<Link href="/quotes/new" />}>
