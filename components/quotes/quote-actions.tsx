@@ -1,77 +1,47 @@
 "use client"
 
-import { useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { Factory, FileText } from "lucide-react"
+import { Button, HStack, Separator } from "@chakra-ui/react"
+import { FileText } from "lucide-react"
 
-import { confirmProduction, deleteQuote } from "@/actions/quotes"
-import { Button } from "@/components/ui/button"
-import { ConfirmDeleteButton } from "@/components/confirm-delete-button"
+import { deleteQuote } from "@/actions/quotes"
+import { ConfirmDeleteButton } from "@/components/chakra/confirm-delete-button"
+import { QuoteStatusButtons } from "@/components/quotes/quote-status-control"
+import type { QuoteStatus } from "@/lib/quote-status"
 
 export function QuoteActions({
   quoteId,
   status,
 }: {
   quoteId: string
-  status: string
+  status: QuoteStatus
 }) {
   const router = useRouter()
-  const [pending, startTransition] = useTransition()
-
-  const canConfirmProduction = status !== "in_production" && status !== "completed"
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        nativeButton={false}
-        render={
-          <a href={`/api/quotes/${quoteId}/pdf?variant=client`} target="_blank" rel="noreferrer" />
-        }
-      >
-        <FileText className="size-4" />
-        PDF cliente
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        nativeButton={false}
-        render={
-          <a
-            href={`/api/quotes/${quoteId}/pdf?variant=production`}
-            target="_blank"
-            rel="noreferrer"
-          />
-        }
-      >
-        <FileText className="size-4" />
-        PDF produção
-      </Button>
-      {canConfirmProduction ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={pending}
-          onClick={() =>
-            startTransition(async () => {
-              try {
-                const { warnings } = await confirmProduction(quoteId)
-                warnings.forEach((w) => toast.warning(w))
-                toast.success("Estoque baixado e orçamento em produção.")
-                router.refresh()
-              } catch (err) {
-                toast.error(err instanceof Error ? err.message : "Erro.")
-              }
-            })
-          }
+    <HStack gap="2" wrap="wrap">
+      <QuoteStatusButtons quoteId={quoteId} status={status} />
+      <Separator orientation="vertical" h="6" mx="1" />
+      <Button variant="outline" size="sm" asChild>
+        <a
+          href={`/api/quotes/${quoteId}/pdf?variant=client`}
+          target="_blank"
+          rel="noreferrer"
         >
-          <Factory className="size-4" />
-          Confirmar produção
-        </Button>
-      ) : null}
+          <FileText />
+          PDF cliente
+        </a>
+      </Button>
+      <Button variant="outline" size="sm" asChild>
+        <a
+          href={`/api/quotes/${quoteId}/pdf?variant=production`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <FileText />
+          PDF produção
+        </a>
+      </Button>
       <ConfirmDeleteButton
         itemLabel="orçamento"
         onDelete={async () => {
@@ -79,6 +49,6 @@ export function QuoteActions({
           router.push("/quotes")
         }}
       />
-    </div>
+    </HStack>
   )
 }

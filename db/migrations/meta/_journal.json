@@ -15,6 +15,13 @@
       "when": 1783034907921,
       "tag": "0001_auth_integration",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790523695892,
+      "tag": "0002_overconfident_satana",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Stage } from "@react-three/drei"
 import { ThreeMFLoader } from "three/examples/jsm/loaders/3MFLoader.js"
 import * as THREE from "three"
+import { Box } from "@chakra-ui/react"
 
 // Renderiza a malha real do .3mf (não é só o thumbnail do fatiador) direto
 // do buffer que já está em memória no navegador — não precisa subir o
@@ -35,7 +36,14 @@ function Model({ buffer }: { buffer: ArrayBuffer }) {
 
 export function ThreeMfViewer({ buffer }: { buffer: ArrayBuffer }) {
   return (
-    <div className="h-72 w-full overflow-hidden rounded-lg border bg-muted/30">
+    <Box
+      h="72"
+      w="full"
+      overflow="hidden"
+      rounded="lg"
+      borderWidth="1px"
+      bg="color-mix(in srgb, var(--muted) 30%, transparent)"
+    >
       <Canvas shadows camera={{ position: [3, 3, 3], fov: 45 }}>
         <Suspense fallback={null}>
           <Stage adjustCamera intensity={0.6} environment="city" shadows="contact">
@@ -44,6 +52,6 @@ export function ThreeMfViewer({ buffer }: { buffer: ArrayBuffer }) {
         </Suspense>
         <OrbitControls makeDefault enableDamping />
       </Canvas>
-    </div>
+    </Box>
   )
 }

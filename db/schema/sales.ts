@@ -68,6 +68,8 @@ export const quotes = sales.table("quotes", {
   realPrice: numeric("real_price", { mode: "number" }).notNull().default(0),
   quantity: integer("quantity").notNull().default(1),
   status: quoteStatusEnum("status").notNull().default("draft"),
+  // Preenchido ao rejeitar (obrigatório nessa transição — ver lib/quote-status).
+  rejectionReason: text("rejection_reason"),
 
   thumbnailUrl: text("thumbnail_url"),
   modelName: text("model_name"),

@@ -33,7 +33,6 @@ export const quoteFormSchema = z.object({
   printerId: z.string().uuid("Selecione uma impressora."),
   assignedUserId: z.string().uuid().nullable().optional(),
   description: z.string().trim().min(1, "Informe a descrição."),
-  status: z.enum(quoteStatusValues),
 
   printTimeH: z.number().min(0),
   prepTimeMin: z.number().min(0),
@@ -69,4 +68,14 @@ export const quoteStatusLabels: Record<(typeof quoteStatusValues)[number], strin
   in_production: "Em produção",
   completed: "Concluído",
   rejected: "Rejeitado",
+}
+
+// colorPalette do Chakra usado no Badge de cada status.
+export const quoteStatusPalette: Record<(typeof quoteStatusValues)[number], string> = {
+  draft: "gray",
+  sent: "gray",
+  approved: "brand",
+  in_production: "brand",
+  completed: "green",
+  rejected: "red",
 }

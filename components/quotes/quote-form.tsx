@@ -1,43 +1,38 @@
 "use client"
 
-import { useRef, useState, useTransition } from "react"
+import { useMemo, useRef, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Plus, Trash2, Upload } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/chakra/toaster"
 import Image from "next/image"
 
 import { saveQuote } from "@/actions/quotes"
 import { parseGcode3mf, matchFilament } from "@/lib/parser3mf"
 import { parseGcode } from "@/lib/parserGcode"
-import { filamentLabel, consumableLabel } from "@/lib/filament-label"
+import { filamentSelectItem, consumableLabel } from "@/lib/filament-label"
 import {
   quoteFormSchema,
-  quoteStatusLabels,
-  quoteStatusValues,
   type QuoteFormValues,
 } from "@/lib/validation/quote"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
+  Box,
+  Button,
+  Card,
+  Flex,
+  Grid,
+  Heading,
+  IconButton,
+  Input,
+  SimpleGrid,
+  Stack,
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  Text,
+  Textarea,
+} from "@chakra-ui/react"
+import { FormField } from "@/components/chakra/entity-form-dialog"
+import { SimpleSelect } from "@/components/chakra/simple-select"
 import { QuoteCostPreview } from "@/components/quotes/quote-cost-preview"
 import {
   Import3mfDialog,
@@ -64,6 +59,57 @@ function matchPrinter(printerModel: string, options: PrinterOption[]) {
     }
   }
   return best
+}
+
+function SectionHeader({
+  title,
+  children,
+}: {
+  title: string
+  children?: React.ReactNode
+}) {
+  return (
+    <Card.Header>
+      <Flex align="center" justify="space-between" gap="4">
+        <Heading as="h3" textStyle="md" fontWeight="bold">
+          {title}
+        </Heading>
+        {children}
+      </Flex>
+    </Card.Header>
+  )
+}
+
+function AddButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button type="button" size="sm" variant="outline" onClick={onClick}>
+      <Plus />
+      Adicionar
+    </Button>
+  )
+}
+
+function RemoveButton({ onClick }: { onClick: () => void }) {
+  return (
+    <IconButton
+      type="button"
+      variant="ghost"
+      size="sm"
+      colorPalette="red"
+      aria-label="Remover"
+      onClick={onClick}
+    >
+      <Trash2 />
+    </IconButton>
+  )
+}
+
+function EmptyText({ children }: { children: React.ReactNode }) {
+  return (
+    <Text textStyle="sm" color="fg.muted">
+      {children}
+    </Text>
+  )
 }
 
 export function QuoteForm({
@@ -217,481 +263,361 @@ export function QuoteForm({
   }
 
   const thumbnailUrl = values.thumbnailUrl
+  const errors = form.formState.errors
+
+  const printerItems = useMemo(
+    () => printerOptions.map((p) => ({ value: p.id, label: p.name })),
+    [printerOptions]
+  )
+  const clientItems = useMemo(
+    () => [
+      { value: NONE, label: "Nenhum" },
+      ...clients.map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [clients]
+  )
+  const teamItems = useMemo(
+    () => [
+      { value: NONE, label: "Nenhum" },
+      ...teamOptions.map((t) => ({ value: t.id, label: t.name })),
+    ],
+    [teamOptions]
+  )
+  const filamentItems = useMemo(
+    () => filamentOptions.map(filamentSelectItem),
+    [filamentOptions]
+  )
+  const consumableItems = useMemo(
+    () => consumableOptions.map((c) => ({ value: c.id, label: consumableLabel(c) })),
+    [consumableOptions]
+  )
 
   return (
     <>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base">Detalhes</CardTitle>
-              <div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".3mf,.gcode"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) void handleImportFile(file)
-                    e.target.value = ""
-                  }}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="size-4" />
-                  Importar .3mf / .gcode
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
+      <Grid
+        as="form"
+        onSubmit={form.handleSubmit(onSubmit)}
+        gap="6"
+        templateColumns={{ base: "1fr", lg: "1fr 320px" }}
+        alignItems="start"
+      >
+        <Stack gap="6">
+          <Card.Root>
+            <SectionHeader title="Detalhes">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".3mf,.gcode"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) void handleImportFile(file)
+                  e.target.value = ""
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload />
+                Importar .3mf / .gcode
+              </Button>
+            </SectionHeader>
+            <Card.Body gap="4">
               {thumbnailUrl ? (
-                <Image
-                  src={thumbnailUrl}
-                  alt="Prévia do modelo"
-                  width={120}
-                  height={120}
-                  unoptimized
-                  className="rounded-md border object-cover"
-                />
+                <Box
+                  alignSelf="start"
+                  rounded="l2"
+                  borderWidth="1px"
+                  overflow="hidden"
+                >
+                  <Image
+                    src={thumbnailUrl}
+                    alt="Prévia do modelo"
+                    width={120}
+                    height={120}
+                    unoptimized
+                    style={{ objectFit: "cover" }}
+                  />
+                </Box>
               ) : null}
 
-              <div className="grid gap-2">
-                <Label htmlFor="description">Descrição</Label>
+              <FormField label="Descrição" errorText={errors.description?.message}>
                 <Textarea
-                  id="description"
                   {...form.register("description")}
                   placeholder="Ex.: Porta joias Olivia"
                 />
-                {form.formState.errors.description ? (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.description.message}
-                  </p>
-                ) : null}
-              </div>
+              </FormField>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Impressora</Label>
+              <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">
+                <FormField label="Impressora" errorText={errors.printerId?.message}>
                   <Controller
                     control={form.control}
                     name="printerId"
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue>
-                            {(value: string) =>
-                              printerOptions.find((p) => p.id === value)?.name ??
-                              "Selecione"
-                            }
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {printerOptions.map((p) => (
-                            <SelectItem key={p.id} value={p.id}>
-                              {p.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SimpleSelect
+                        items={printerItems}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        invalid={!!errors.printerId}
+                      />
                     )}
                   />
-                  {form.formState.errors.printerId ? (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.printerId.message}
-                    </p>
-                  ) : null}
-                </div>
+                </FormField>
 
-                <div className="grid gap-2">
-                  <Label>Status</Label>
-                  <Controller
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue>
-                            {(value: keyof typeof quoteStatusLabels) =>
-                              quoteStatusLabels[value] ?? value
-                            }
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {quoteStatusValues.map((s) => (
-                            <SelectItem key={s} value={s}>
-                              {quoteStatusLabels[s]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label>Cliente</Label>
+                <FormField label="Cliente">
                   <Controller
                     control={form.control}
                     name="clientId"
                     render={({ field }) => (
-                      <Select
+                      <SimpleSelect
+                        items={clientItems}
                         value={field.value ?? NONE}
                         onValueChange={(v) => field.onChange(v === NONE ? null : v)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue>
-                            {(value: string) =>
-                              value === NONE || !value
-                                ? "Nenhum"
-                                : (clients.find((c) => c.id === value)?.name ?? "Nenhum")
-                            }
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={NONE}>Nenhum</SelectItem>
-                          {clients.map((c) => (
-                            <SelectItem key={c.id} value={c.id}>
-                              {c.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      />
                     )}
                   />
-                </div>
+                </FormField>
 
-                <div className="grid gap-2">
-                  <Label>Responsável</Label>
+                <FormField label="Responsável">
                   <Controller
                     control={form.control}
                     name="assignedUserId"
                     render={({ field }) => (
-                      <Select
+                      <SimpleSelect
+                        items={teamItems}
                         value={field.value ?? NONE}
                         onValueChange={(v) => field.onChange(v === NONE ? null : v)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue>
-                            {(value: string) =>
-                              value === NONE || !value
-                                ? "Nenhum"
-                                : (teamOptions.find((t) => t.id === value)?.name ?? "Nenhum")
-                            }
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={NONE}>Nenhum</SelectItem>
-                          {teamOptions.map((t) => (
-                            <SelectItem key={t.id} value={t.id}>
-                              {t.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      />
                     )}
                   />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </FormField>
+              </SimpleGrid>
+            </Card.Body>
+          </Card.Root>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base">Filamentos</CardTitle>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  filamentFields.append({ filamentId: "", weightG: 0 })
-                }
-              >
-                <Plus className="size-4" />
-                Adicionar
-              </Button>
-            </CardHeader>
-            <CardContent>
+          <Card.Root>
+            <SectionHeader title="Filamentos">
+              <AddButton
+                onClick={() => filamentFields.append({ filamentId: "", weightG: 0 })}
+              />
+            </SectionHeader>
+            <Card.Body gap="2">
               {filamentFields.fields.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Nenhum filamento adicionado.
-                </p>
+                <EmptyText>Nenhum filamento adicionado.</EmptyText>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Filamento</TableHead>
-                      <TableHead className="w-32">Peso (g)</TableHead>
-                      <TableHead className="w-1" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <Table.Root size="sm">
+                  <Table.Header>
+                    <Table.Row bg="transparent">
+                      <Table.ColumnHeader>Filamento</Table.ColumnHeader>
+                      <Table.ColumnHeader w="32">Peso (g)</Table.ColumnHeader>
+                      <Table.ColumnHeader w="1" />
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
                     {filamentFields.fields.map((field, index) => (
-                      <TableRow key={field.id}>
-                        <TableCell>
+                      <Table.Row key={field.id} bg="transparent">
+                        <Table.Cell>
                           <Controller
                             control={form.control}
                             name={`filamentItems.${index}.filamentId`}
                             render={({ field: f }) => (
-                              <Select value={f.value} onValueChange={f.onChange}>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue>
-                                    {(value: string) => {
-                                      const opt = filamentOptions.find((o) => o.id === value)
-                                      return opt ? filamentLabel(opt) : "Selecione"
-                                    }}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {filamentOptions.map((opt) => (
-                                    <SelectItem key={opt.id} value={opt.id}>
-                                      {filamentLabel(opt)}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              <SimpleSelect
+                                items={filamentItems}
+                                value={f.value}
+                                onValueChange={f.onChange}
+                              />
                             )}
                           />
-                        </TableCell>
-                        <TableCell>
+                        </Table.Cell>
+                        <Table.Cell>
                           <Input
+                            size="sm"
                             type="number"
                             step="0.01"
                             {...form.register(`filamentItems.${index}.weightG`, {
                               valueAsNumber: true,
                             })}
                           />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => filamentFields.remove(index)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <RemoveButton onClick={() => filamentFields.remove(index)} />
+                        </Table.Cell>
+                      </Table.Row>
                     ))}
-                  </TableBody>
-                </Table>
+                  </Table.Body>
+                </Table.Root>
               )}
-              {form.formState.errors.filamentItems?.message ? (
-                <p className="mt-2 text-sm text-destructive">
-                  {form.formState.errors.filamentItems.message}
-                </p>
+              {errors.filamentItems?.message ? (
+                <Text textStyle="sm" color="fg.error">
+                  {errors.filamentItems.message}
+                </Text>
               ) : null}
-            </CardContent>
-          </Card>
+            </Card.Body>
+          </Card.Root>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base">Consumíveis</CardTitle>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  consumableFields.append({ consumableId: "", quantity: 1 })
-                }
-              >
-                <Plus className="size-4" />
-                Adicionar
-              </Button>
-            </CardHeader>
-            <CardContent>
+          <Card.Root>
+            <SectionHeader title="Consumíveis">
+              <AddButton
+                onClick={() => consumableFields.append({ consumableId: "", quantity: 1 })}
+              />
+            </SectionHeader>
+            <Card.Body>
               {consumableFields.fields.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Nenhum consumível adicionado.
-                </p>
+                <EmptyText>Nenhum consumível adicionado.</EmptyText>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Consumível</TableHead>
-                      <TableHead className="w-32">Qtd.</TableHead>
-                      <TableHead className="w-1" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <Table.Root size="sm">
+                  <Table.Header>
+                    <Table.Row bg="transparent">
+                      <Table.ColumnHeader>Consumível</Table.ColumnHeader>
+                      <Table.ColumnHeader w="32">Qtd.</Table.ColumnHeader>
+                      <Table.ColumnHeader w="1" />
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
                     {consumableFields.fields.map((field, index) => (
-                      <TableRow key={field.id}>
-                        <TableCell>
+                      <Table.Row key={field.id} bg="transparent">
+                        <Table.Cell>
                           <Controller
                             control={form.control}
                             name={`consumableItems.${index}.consumableId`}
                             render={({ field: f }) => (
-                              <Select value={f.value} onValueChange={f.onChange}>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue>
-                                    {(value: string) => {
-                                      const opt = consumableOptions.find((o) => o.id === value)
-                                      return opt ? consumableLabel(opt) : "Selecione"
-                                    }}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {consumableOptions.map((opt) => (
-                                    <SelectItem key={opt.id} value={opt.id}>
-                                      {consumableLabel(opt)}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              <SimpleSelect
+                                items={consumableItems}
+                                value={f.value}
+                                onValueChange={f.onChange}
+                              />
                             )}
                           />
-                        </TableCell>
-                        <TableCell>
+                        </Table.Cell>
+                        <Table.Cell>
                           <Input
+                            size="sm"
                             type="number"
                             step="0.01"
                             {...form.register(`consumableItems.${index}.quantity`, {
                               valueAsNumber: true,
                             })}
                           />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => consumableFields.remove(index)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <RemoveButton onClick={() => consumableFields.remove(index)} />
+                        </Table.Cell>
+                      </Table.Row>
                     ))}
-                  </TableBody>
-                </Table>
+                  </Table.Body>
+                </Table.Root>
               )}
-            </CardContent>
-          </Card>
+            </Card.Body>
+          </Card.Root>
 
           {plateFields.fields.length > 0 ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Pratos (importados)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Prato</TableHead>
-                      <TableHead>Tempo (h)</TableHead>
-                      <TableHead>Peso (g)</TableHead>
-                      <TableHead className="w-1" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+            <Card.Root>
+              <SectionHeader title="Pratos (importados)" />
+              <Card.Body>
+                <Table.Root size="sm">
+                  <Table.Header>
+                    <Table.Row bg="transparent">
+                      <Table.ColumnHeader>Prato</Table.ColumnHeader>
+                      <Table.ColumnHeader>Tempo (h)</Table.ColumnHeader>
+                      <Table.ColumnHeader>Peso (g)</Table.ColumnHeader>
+                      <Table.ColumnHeader w="1" />
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
                     {plateFields.fields.map((field, index) => (
-                      <TableRow key={field.id}>
-                        <TableCell>{field.label}</TableCell>
-                        <TableCell>{field.printTimeH.toFixed(2)}</TableCell>
-                        <TableCell>{field.weightG.toFixed(0)}</TableCell>
-                        <TableCell>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => plateFields.remove(index)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
+                      <Table.Row key={field.id} bg="transparent">
+                        <Table.Cell>{field.label}</Table.Cell>
+                        <Table.Cell>{field.printTimeH.toFixed(2)}</Table.Cell>
+                        <Table.Cell>{field.weightG.toFixed(0)}</Table.Cell>
+                        <Table.Cell>
+                          <RemoveButton onClick={() => plateFields.remove(index)} />
+                        </Table.Cell>
+                      </Table.Row>
                     ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                  </Table.Body>
+                </Table.Root>
+              </Card.Body>
+            </Card.Root>
           ) : null}
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Tempos</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {(
-                [
-                  ["printTimeH", "Impressão (h)"],
-                  ["prepTimeMin", "Preparação (min)"],
-                  ["slicingTimeMin", "Fatiamento (min)"],
-                  ["materialChangeMin", "Troca de material (min)"],
-                  ["transferStartMin", "Transferência & start (min)"],
-                  ["removalMin", "Retirada (min)"],
-                  ["supportRemovalMin", "Retirada de suportes (min)"],
-                  ["additionalWorkMin", "Trabalhos adicionais (min)"],
-                ] as const
-              ).map(([name, label]) => (
-                <div key={name} className="grid gap-2">
-                  <Label htmlFor={name}>{label}</Label>
+          <Card.Root>
+            <SectionHeader title="Tempos" />
+            <Card.Body>
+              <SimpleGrid columns={{ base: 2, sm: 4 }} gap="4">
+                {(
+                  [
+                    ["printTimeH", "Impressão (h)"],
+                    ["prepTimeMin", "Preparação (min)"],
+                    ["slicingTimeMin", "Fatiamento (min)"],
+                    ["materialChangeMin", "Troca de material (min)"],
+                    ["transferStartMin", "Transferência & start (min)"],
+                    ["removalMin", "Retirada (min)"],
+                    ["supportRemovalMin", "Retirada de suportes (min)"],
+                    ["additionalWorkMin", "Trabalhos adicionais (min)"],
+                  ] as const
+                ).map(([name, label]) => (
+                  <FormField key={name} label={label}>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      {...form.register(name, { valueAsNumber: true })}
+                    />
+                  </FormField>
+                ))}
+              </SimpleGrid>
+            </Card.Body>
+          </Card.Root>
+
+          <Card.Root>
+            <SectionHeader title="Precificação" />
+            <Card.Body>
+              <SimpleGrid columns={{ base: 2, sm: 4 }} gap="4">
+                <FormField label="Consumíveis avulso (R$)">
                   <Input
-                    id={name}
                     type="number"
                     step="0.01"
-                    {...form.register(name, { valueAsNumber: true })}
+                    {...form.register("consumablesMiscCost", { valueAsNumber: true })}
                   />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                </FormField>
+                <FormField label="Markup (%)">
+                  <Input
+                    type="number"
+                    step="1"
+                    {...form.register("markupPercent", { valueAsNumber: true })}
+                  />
+                </FormField>
+                <FormField label="Preço cotado unit. (R$)">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...form.register("realPrice", { valueAsNumber: true })}
+                  />
+                </FormField>
+                <FormField label="Quantidade">
+                  <Input
+                    type="number"
+                    step="1"
+                    {...form.register("quantity", { valueAsNumber: true })}
+                  />
+                </FormField>
+              </SimpleGrid>
+            </Card.Body>
+          </Card.Root>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Precificação</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div className="grid gap-2">
-                <Label htmlFor="consumablesMiscCost">Consumíveis avulso (R$)</Label>
-                <Input
-                  id="consumablesMiscCost"
-                  type="number"
-                  step="0.01"
-                  {...form.register("consumablesMiscCost", { valueAsNumber: true })}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="markupPercent">Markup (%)</Label>
-                <Input
-                  id="markupPercent"
-                  type="number"
-                  step="1"
-                  {...form.register("markupPercent", { valueAsNumber: true })}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="realPrice">Preço cotado unit. (R$)</Label>
-                <Input
-                  id="realPrice"
-                  type="number"
-                  step="0.01"
-                  {...form.register("realPrice", { valueAsNumber: true })}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="quantity">Quantidade</Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  step="1"
-                  {...form.register("quantity", { valueAsNumber: true })}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Button type="submit" disabled={pending}>
-            {pending ? "Salvando..." : "Salvar orçamento"}
+          <Button
+            type="submit"
+            alignSelf="start"
+            loading={pending}
+            loadingText="Salvando..."
+          >
+            Salvar orçamento
           </Button>
-        </div>
+        </Stack>
 
-        <div className="space-y-4">
+        <Stack gap="4" position={{ lg: "sticky" }} top={{ lg: "20" }}>
           <QuoteCostPreview
             input={{
               printTimeH: values.printTimeH ?? 0,
@@ -733,8 +659,8 @@ export function QuoteForm({
                 unitPrice: consumableById.get(i.consumableId)?.unitPrice ?? 0,
               }))}
           />
-        </div>
-      </form>
+        </Stack>
+      </Grid>
 
       <Import3mfDialog
         pending={pendingImport}

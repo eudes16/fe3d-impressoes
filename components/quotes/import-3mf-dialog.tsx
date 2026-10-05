@@ -1,34 +1,23 @@
 "use client"
 
+import { useMemo } from "react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
 import { Check } from "lucide-react"
 
 import {
+  Box,
+  Button,
+  CloseButton,
   Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import {
+  HStack,
+  Portal,
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { filamentLabel } from "@/lib/filament-label"
+  Text,
+} from "@chakra-ui/react"
+import { SimpleSelect } from "@/components/chakra/simple-select"
+import { ColorDots } from "@/components/chakra/color-dots"
+import { filamentSelectItem } from "@/lib/filament-label"
 import type { SliceData } from "@/lib/parser3mf"
 import type { filaments } from "@/db/schema"
 
@@ -71,120 +60,129 @@ export function Import3mfDialog({
   onConfirm: () => void
   onCancel: () => void
 }) {
+  const selectItems = useMemo(
+    () => [
+      { value: SKIP, label: "Não vincular" },
+      ...filamentOptions.map(filamentSelectItem),
+    ],
+    [filamentOptions]
+  )
+
   return (
-    <Dialog
+    <Dialog.Root
       open={pending !== null}
-      onOpenChange={(open) => {
-        if (!open) onCancel()
+      onOpenChange={(e) => {
+        if (!e.open) onCancel()
       }}
+      placement="center"
+      size="xl"
+      scrollBehavior="inside"
     >
-      <DialogContent className="max-h-[90vh] max-w-3xl min-w-md overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Confirmar filamentos do arquivo importado</DialogTitle>
-          <DialogDescription>
-            O fatiador não identifica a bobina exata — confira ou troque o
-            vínculo de cada filamento antes de importar.
-          </DialogDescription>
-        </DialogHeader>
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header flexDirection="column" alignItems="start">
+              <Dialog.Title>Confirmar filamentos do arquivo importado</Dialog.Title>
+              <Dialog.Description>
+                O fatiador não identifica a bobina exata — confira ou troque o
+                vínculo de cada filamento antes de importar.
+              </Dialog.Description>
+            </Dialog.Header>
 
-        {pending?.source === "3mf" ? (
-          <ThreeMfViewer buffer={pending.buffer} />
-        ) : null}
+            <Dialog.Body display="flex" flexDirection="column" gap="4">
+              {pending?.source === "3mf" ? (
+                <ThreeMfViewer buffer={pending.buffer} />
+              ) : null}
 
-        {pending?.source === "gcode" && pending.data.thumbnailBase64 ? (
-          <Image
-            src={`data:image/png;base64,${pending.data.thumbnailBase64}`}
-            alt="Prévia do modelo"
-            width={260}
-            height={260}
-            unoptimized
-            className="mx-auto rounded-md border object-contain"
-          />
-        ) : null}
+              {pending?.source === "gcode" && pending.data.thumbnailBase64 ? (
+                <Box
+                  mx="auto"
+                  rounded="l2"
+                  borderWidth="1px"
+                  overflow="hidden"
+                >
+                  <Image
+                    src={`data:image/png;base64,${pending.data.thumbnailBase64}`}
+                    alt="Prévia do modelo"
+                    width={260}
+                    height={260}
+                    unoptimized
+                    style={{ objectFit: "contain" }}
+                  />
+                </Box>
+              ) : null}
 
-        {pending ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Detectado no .3mf</TableHead>
-                <TableHead className="w-24">Peso</TableHead>
-                <TableHead className="w-64">Vincular a</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pending.data.filaments.map((sf, index) => {
-                const exactMatch =
-                  !!sf.notes && filamentOptions.some((f) => f.id === sf.notes)
-                return (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {sf.colorHex ? (
-                          <span
-                            className="size-3.5 shrink-0 rounded-full border"
-                            style={{ backgroundColor: sf.colorHex }}
-                            title={sf.colorHex}
-                          />
-                        ) : null}
-                        <div>
-                          <div className="font-medium">
-                            {sf.type || "Tipo desconhecido"}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {sf.vendor || "—"}
-                          </div>
-                        </div>
-                        {exactMatch ? (
-                          <span className="flex items-center gap-0.5 text-xs text-chart-3">
-                            <Check className="size-3" />
-                            UUID
-                          </span>
-                        ) : null}
-                      </div>
-                    </TableCell>
-                    <TableCell>{sf.weightG.toFixed(1)} g</TableCell>
-                    <TableCell>
-                      <Select
-                        value={pending.mapping[index] ?? SKIP}
-                        onValueChange={(v) =>
-                          onMappingChange(index, v === SKIP ? null : v)
-                        }
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue>
-                            {(value: string) => {
-                              if (value === SKIP) return "Não vincular"
-                              const f = filamentOptions.find((o) => o.id === value)
-                              return f ? filamentLabel(f) : "Não vincular"
-                            }}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={SKIP}>Não vincular</SelectItem>
-                          {filamentOptions.map((f) => (
-                            <SelectItem key={f.id} value={f.id}>
-                              {filamentLabel(f)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        ) : null}
+              {pending ? (
+                <Table.Root size="sm">
+                  <Table.Header>
+                    <Table.Row bg="transparent">
+                      <Table.ColumnHeader>Detectado no arquivo</Table.ColumnHeader>
+                      <Table.ColumnHeader w="24">Peso</Table.ColumnHeader>
+                      <Table.ColumnHeader w="64">Vincular a</Table.ColumnHeader>
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    {pending.data.filaments.map((sf, index) => {
+                      const exactMatch =
+                        !!sf.notes && filamentOptions.some((f) => f.id === sf.notes)
+                      return (
+                        <Table.Row key={index} bg="transparent">
+                          <Table.Cell>
+                            <HStack gap="2">
+                              <ColorDots colors={sf.colorHex ? [sf.colorHex] : []} />
+                              <Box>
+                                <Text fontWeight="medium">
+                                  {sf.type || "Tipo desconhecido"}
+                                </Text>
+                                <Text textStyle="xs" color="fg.muted">
+                                  {sf.vendor || "—"}
+                                </Text>
+                              </Box>
+                              {exactMatch ? (
+                                <HStack
+                                  gap="0.5"
+                                  textStyle="xs"
+                                  style={{ color: "var(--chart-3)" }}
+                                >
+                                  <Check size={12} />
+                                  UUID
+                                </HStack>
+                              ) : null}
+                            </HStack>
+                          </Table.Cell>
+                          <Table.Cell>{sf.weightG.toFixed(1)} g</Table.Cell>
+                          <Table.Cell>
+                            <SimpleSelect
+                              items={selectItems}
+                              value={pending.mapping[index] ?? SKIP}
+                              onValueChange={(v) =>
+                                onMappingChange(index, v === SKIP ? null : v)
+                              }
+                            />
+                          </Table.Cell>
+                        </Table.Row>
+                      )
+                    })}
+                  </Table.Body>
+                </Table.Root>
+              ) : null}
+            </Dialog.Body>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
-          </Button>
-          <Button type="button" onClick={onConfirm}>
-            Confirmar e importar
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            <Dialog.Footer>
+              <Button type="button" variant="outline" onClick={onCancel}>
+                Cancelar
+              </Button>
+              <Button type="button" onClick={onConfirm}>
+                Confirmar e importar
+              </Button>
+            </Dialog.Footer>
+            <Dialog.CloseTrigger asChild>
+              <CloseButton size="sm" />
+            </Dialog.CloseTrigger>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
   )
 }

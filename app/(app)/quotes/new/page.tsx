@@ -1,6 +1,7 @@
 import { asc } from "drizzle-orm"
 import { db } from "@/db"
 import { clients, printers, filaments, consumables, profiles, settings } from "@/db/schema"
+import { Stack } from "@chakra-ui/react"
 import { QuoteForm } from "@/components/quotes/quote-form"
 import type { QuoteFormValues } from "@/lib/validation/quote"
 
@@ -20,7 +21,6 @@ export default async function NewQuotePage() {
     printerId: "",
     assignedUserId: null,
     description: "",
-    status: "draft",
     printTimeH: 0,
     prepTimeMin: 0,
     slicingTimeMin: 0,
@@ -42,8 +42,7 @@ export default async function NewQuotePage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Novo orçamento</h1>
+    <Stack gap="4">
       <QuoteForm
         defaultValues={defaultValues}
         clients={clientRows}
@@ -53,7 +52,7 @@ export default async function NewQuotePage() {
         teamOptions={teamRows}
         settingsRow={settingsRows[0] ?? (await ensureSettings())}
       />
-    </div>
+    </Stack>
   )
 }
 

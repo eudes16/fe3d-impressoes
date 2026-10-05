@@ -13,9 +13,11 @@ import {
   quoteConsumableItems,
   quotePlateItems,
 } from "@/db/schema"
+import { Alert, Badge, Stack } from "@chakra-ui/react"
+import { PageHeader } from "@/components/chakra/page-header"
 import { QuoteForm } from "@/components/quotes/quote-form"
 import { QuoteActions } from "@/components/quotes/quote-actions"
-import { quoteStatusLabels } from "@/lib/validation/quote"
+import { quoteStatusLabels, quoteStatusPalette } from "@/lib/validation/quote"
 import type { QuoteFormValues } from "@/lib/validation/quote"
 
 export default async function QuoteDetailPage({
@@ -62,7 +64,6 @@ export default async function QuoteDetailPage({
     printerId: quote.printerId,
     assignedUserId: quote.assignedUserId,
     description: quote.description,
-    status: quote.status,
     printTimeH: quote.printTimeH,
     prepTimeMin: quote.prepTimeMin,
     slicingTimeMin: quote.slicingTimeMin,
@@ -94,16 +95,29 @@ export default async function QuoteDetailPage({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">{quote.description}</h1>
-          <p className="text-muted-foreground">
+    <Stack gap="4">
+      <PageHeader
+        title={quote.description}
+        badge={
+          <Badge colorPalette={quoteStatusPalette[quote.status]} variant="subtle">
             {quoteStatusLabels[quote.status]}
-          </p>
-        </div>
+          </Badge>
+        }
+      >
         <QuoteActions quoteId={quote.id} status={quote.status} />
-      </div>
+      </PageHeader>
+
+      {quote.status === "rejected" ? (
+        <Alert.Root status="error" rounded="l3">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Orçamento rejeitado</Alert.Title>
+            <Alert.Description>
+              {quote.rejectionReason || "Motivo não informado."}
+            </Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
+      ) : null}
 
       <QuoteForm
         quoteId={quote.id}
@@ -124,6 +138,6 @@ export default async function QuoteDetailPage({
           }
         }
       />
-    </div>
+    </Stack>
   )
 }

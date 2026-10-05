@@ -1,3 +1,5 @@
+import { Card, Flex, Heading, Separator, Text } from "@chakra-ui/react"
+
 import {
   computeQuoteCost,
   type QuoteCostInput,
@@ -6,12 +8,6 @@ import {
   type QuoteCostFilamentItem,
   type QuoteCostConsumableItem,
 } from "@/lib/quote-costs"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 
 function Row({
   label,
@@ -23,12 +19,15 @@ function Row({
   strong?: boolean
 }) {
   return (
-    <div
-      className={`flex justify-between text-sm ${strong ? "font-semibold" : "text-muted-foreground"}`}
+    <Flex
+      justify="space-between"
+      textStyle="sm"
+      fontWeight={strong ? "semibold" : undefined}
+      color={strong ? "fg" : "fg.muted"}
     >
       <span>{label}</span>
-      <span className={strong ? "text-foreground" : ""}>{value}</span>
-    </div>
+      <span>{value}</span>
+    </Flex>
   )
 }
 
@@ -49,27 +48,31 @@ export function QuoteCostPreview({
 }) {
   if (!printer) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Custos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
+      <Card.Root>
+        <Card.Header>
+          <Heading as="h3" textStyle="md" fontWeight="bold">
+            Custos
+          </Heading>
+        </Card.Header>
+        <Card.Body>
+          <Text textStyle="sm" color="fg.muted">
             Selecione uma impressora para ver o cálculo de custo.
-          </p>
-        </CardContent>
-      </Card>
+          </Text>
+        </Card.Body>
+      </Card.Root>
     )
   }
 
   const cost = computeQuoteCost(input, printer, settings, filamentItems, consumableItems)
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Custos</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-1">
+    <Card.Root>
+      <Card.Header>
+        <Heading as="h3" textStyle="md" fontWeight="bold">
+          Custos
+        </Heading>
+      </Card.Header>
+      <Card.Body gap="1">
         <Row label="Filamento" value={currency(cost.filament)} />
         <Row label="Eletricidade" value={currency(cost.electricity)} />
         <Row label="Depreciação" value={currency(cost.depreciation)} />
@@ -84,7 +87,7 @@ export function QuoteCostPreview({
         />
         <Row label="Preço sugerido (unit.)" value={currency(cost.suggestedPriceUnit)} />
         <Row label="Preço real (unit.)" value={currency(cost.realPriceUnit)} />
-        <div className="my-2 border-t" />
+        <Separator my="2" />
         <Row label={`Custo total (×${cost.quantity})`} value={currency(cost.totalCost)} />
         <Row label="Preço sugerido total" value={currency(cost.totalSuggestedPrice)} />
         <Row label="Preço real total" value={currency(cost.totalRealPrice)} strong />
@@ -93,7 +96,7 @@ export function QuoteCostPreview({
           value={`${currency(cost.profit)} (${cost.profitPercent.toFixed(1)}%)`}
           strong
         />
-      </CardContent>
-    </Card>
+      </Card.Body>
+    </Card.Root>
   )
 }
