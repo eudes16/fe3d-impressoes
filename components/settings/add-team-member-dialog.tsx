@@ -1,28 +1,11 @@
 "use client"
 
+import { Button, Input, NativeSelect } from "@chakra-ui/react"
 import { UserPlus } from "lucide-react"
 
 import { createTeamMember } from "@/actions/profiles"
 import { useEntityFormAction } from "@/lib/hooks/use-entity-form-action"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { EntityFormDialog, FormField } from "@/components/chakra/entity-form-dialog"
 
 export function AddTeamMemberDialog() {
   const { open, setOpen, pending, handleSubmit } = useEntityFormAction(
@@ -31,65 +14,47 @@ export function AddTeamMemberDialog() {
   )
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button size="sm">
-            <UserPlus className="size-4" />
-            Adicionar membro
-          </Button>
-        }
-      />
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Adicionar membro à equipe</DialogTitle>
-          <DialogDescription>
-            A conta já entra confirmada. Repasse o e-mail e a senha pra pessoa
-            entrar — ela pode trocar a senha depois em &quot;Meu perfil&quot;.
-          </DialogDescription>
-        </DialogHeader>
-        <form action={handleSubmit} className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Nome</Label>
-            <Input id="name" name="name" required />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input id="email" name="email" type="email" required />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Senha inicial</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              minLength={6}
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="role">Papel</Label>
-            <Select name="role" defaultValue="operador">
-              <SelectTrigger id="role" className="w-full">
-                <SelectValue>
-                  {(value: "admin" | "operador") =>
-                    value === "admin" ? "Administrador" : "Operador"
-                  }
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="operador">Operador</SelectItem>
-                <SelectItem value="admin">Administrador</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <DialogFooter>
-            <Button type="submit" disabled={pending}>
-              {pending ? "Criando..." : "Criar acesso"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <EntityFormDialog
+      editing={false}
+      createLabel="Adicionar membro"
+      title="Adicionar membro à equipe"
+      description={
+        <>
+          A conta já entra confirmada. Repasse o e-mail e a senha pra pessoa
+          entrar — ela pode trocar a senha depois em &quot;Meu perfil&quot;.
+        </>
+      }
+      trigger={
+        <Button size="sm">
+          <UserPlus />
+          Adicionar membro
+        </Button>
+      }
+      open={open}
+      onOpenChange={setOpen}
+      pending={pending}
+      onSubmit={handleSubmit}
+      submitLabel="Criar acesso"
+      pendingLabel="Criando..."
+    >
+      <FormField label="Nome" required>
+        <Input name="name" />
+      </FormField>
+      <FormField label="E-mail" required>
+        <Input name="email" type="email" />
+      </FormField>
+      <FormField label="Senha inicial" required>
+        <Input name="password" type="password" minLength={6} />
+      </FormField>
+      <FormField label="Papel">
+        <NativeSelect.Root>
+          <NativeSelect.Field name="role" defaultValue="operador">
+            <option value="operador">Operador</option>
+            <option value="admin">Administrador</option>
+          </NativeSelect.Field>
+          <NativeSelect.Indicator />
+        </NativeSelect.Root>
+      </FormField>
+    </EntityFormDialog>
   )
 }

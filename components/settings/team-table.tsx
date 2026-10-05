@@ -1,24 +1,10 @@
 "use client"
 
 import { useTransition } from "react"
-import { toast } from "sonner"
+import { NativeSelect, Table, Text } from "@chakra-ui/react"
+import { toast } from "@/components/chakra/toaster"
 
 import { updateProfileRole } from "@/actions/profiles"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import type { profiles } from "@/db/schema"
 
 type Profile = typeof profiles.$inferSelect
@@ -44,50 +30,44 @@ export function TeamTable({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Nome</TableHead>
-          <TableHead>E-mail</TableHead>
-          <TableHead>Papel</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <Table.Root size="sm">
+      <Table.Header>
+        <Table.Row bg="transparent">
+          <Table.ColumnHeader>Nome</Table.ColumnHeader>
+          <Table.ColumnHeader>E-mail</Table.ColumnHeader>
+          <Table.ColumnHeader>Papel</Table.ColumnHeader>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
         {members.map((member) => (
-          <TableRow key={member.id}>
-            <TableCell className="font-medium">
+          <Table.Row key={member.id} bg="transparent">
+            <Table.Cell fontWeight="semibold">
               {member.name || "—"}
               {member.id === currentUserId ? (
-                <span className="text-muted-foreground"> (você)</span>
+                <Text as="span" color="fg.muted" fontWeight="normal">
+                  {" "}
+                  (você)
+                </Text>
               ) : null}
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {member.email}
-            </TableCell>
-            <TableCell>
-              <Select
-                value={member.role}
-                onValueChange={(value) =>
-                  handleRoleChange(member.id, value as string)
-                }
-                disabled={pending}
-              >
-                <SelectTrigger size="sm">
-                  <SelectValue>
-                    {(value: "admin" | "operador") =>
-                      value === "admin" ? "Administrador" : "Operador"
-                    }
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Administrador</SelectItem>
-                  <SelectItem value="operador">Operador</SelectItem>
-                </SelectContent>
-              </Select>
-            </TableCell>
-          </TableRow>
+            </Table.Cell>
+            <Table.Cell color="fg.muted">{member.email}</Table.Cell>
+            <Table.Cell>
+              <NativeSelect.Root size="sm" width="40" disabled={pending}>
+                <NativeSelect.Field
+                  value={member.role}
+                  onChange={(e) =>
+                    handleRoleChange(member.id, e.currentTarget.value)
+                  }
+                >
+                  <option value="admin">Administrador</option>
+                  <option value="operador">Operador</option>
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
+            </Table.Cell>
+          </Table.Row>
         ))}
-      </TableBody>
-    </Table>
+      </Table.Body>
+    </Table.Root>
   )
 }

@@ -1,12 +1,11 @@
 "use client"
 
 import { useTransition } from "react"
-import { toast } from "sonner"
+import { Box, Button, GridItem, Input, SimpleGrid } from "@chakra-ui/react"
+import { toast } from "@/components/chakra/toaster"
 
 import { updateSettings } from "@/actions/settings"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { FormField } from "@/components/chakra/entity-form-dialog"
 import type { settings } from "@/db/schema"
 
 type Settings = typeof settings.$inferSelect
@@ -26,54 +25,43 @@ export function SettingsForm({ settings }: { settings: Settings }) {
   }
 
   return (
-    <form action={handleSubmit} className="grid grid-cols-2 gap-4">
-      <div className="grid gap-2">
-        <Label htmlFor="energyCostPerKwh">Custo de energia (R$/kWh)</Label>
-        <Input
-          id="energyCostPerKwh"
-          name="energyCostPerKwh"
-          type="number"
-          step="0.01"
-          defaultValue={settings.energyCostPerKwh}
-          required
-        />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="laborCostPerHour">Custo de mão de obra (R$/h)</Label>
-        <Input
-          id="laborCostPerHour"
-          name="laborCostPerHour"
-          type="number"
-          step="0.01"
-          defaultValue={settings.laborCostPerHour}
-          required
-        />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="failureRatePercent">Taxa de falhas (%)</Label>
-        <Input
-          id="failureRatePercent"
-          name="failureRatePercent"
-          type="number"
-          step="0.1"
-          defaultValue={settings.failureRatePercent}
-          required
-        />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="currency">Moeda</Label>
-        <Input
-          id="currency"
-          name="currency"
-          defaultValue={settings.currency}
-          required
-        />
-      </div>
-      <div className="col-span-2">
-        <Button type="submit" disabled={pending}>
-          {pending ? "Salvando..." : "Salvar configurações"}
-        </Button>
-      </div>
-    </form>
+    <Box asChild>
+      <form action={handleSubmit}>
+        <SimpleGrid columns={2} gap="4">
+          <FormField label="Custo de energia (R$/kWh)" required>
+            <Input
+              name="energyCostPerKwh"
+              type="number"
+              step="0.01"
+              defaultValue={settings.energyCostPerKwh}
+            />
+          </FormField>
+          <FormField label="Custo de mão de obra (R$/h)" required>
+            <Input
+              name="laborCostPerHour"
+              type="number"
+              step="0.01"
+              defaultValue={settings.laborCostPerHour}
+            />
+          </FormField>
+          <FormField label="Taxa de falhas (%)" required>
+            <Input
+              name="failureRatePercent"
+              type="number"
+              step="0.1"
+              defaultValue={settings.failureRatePercent}
+            />
+          </FormField>
+          <FormField label="Moeda" required>
+            <Input name="currency" defaultValue={settings.currency} />
+          </FormField>
+          <GridItem colSpan={2}>
+            <Button type="submit" loading={pending} loadingText="Salvando...">
+              Salvar configurações
+            </Button>
+          </GridItem>
+        </SimpleGrid>
+      </form>
+    </Box>
   )
 }
