@@ -1,49 +1,47 @@
 "use client"
 
 import { useActionState } from "react"
+import { Button, Card, Input, Stack, Text } from "@chakra-ui/react"
 
 import { signIn } from "@/actions/auth"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { FormField } from "@/components/chakra/entity-form-dialog"
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(signIn, null)
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Entrar</CardTitle>
-        <CardDescription>Acesse o painel da F&E 3D</CardDescription>
-      </CardHeader>
+    <Card.Root>
+      <Card.Header>
+        <Card.Title>Entrar</Card.Title>
+        <Card.Description>Acesse o painel da F&E 3D</Card.Description>
+      </Card.Header>
       <form action={formAction}>
-        <CardContent className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input id="email" name="email" type="email" required />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input id="password" name="password" type="password" required />
-          </div>
-          {state?.error ? (
-            <p className="text-sm text-destructive">{state.error}</p>
-          ) : null}
-        </CardContent>
-        <CardFooter>
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Entrando..." : "Entrar"}
+        <Card.Body>
+          <Stack gap="4">
+            <FormField label="E-mail" required>
+              <Input name="email" type="email" />
+            </FormField>
+            <FormField label="Senha" required>
+              <Input name="password" type="password" />
+            </FormField>
+            {state?.error ? (
+              <Text textStyle="sm" color="fg.error">
+                {state.error}
+              </Text>
+            ) : null}
+          </Stack>
+        </Card.Body>
+        <Card.Footer>
+          <Button
+            type="submit"
+            width="full"
+            loading={pending}
+            loadingText="Entrando..."
+          >
+            Entrar
           </Button>
-        </CardFooter>
+        </Card.Footer>
       </form>
-    </Card>
+    </Card.Root>
   )
 }

@@ -1,3 +1,4 @@
+import { Box } from "@chakra-ui/react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AppHeader } from "@/components/app-header"
 
@@ -7,12 +8,14 @@ export default function AppGroupLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen">
+    <Box minH="100vh">
       <AppSidebar />
-      <div className="flex flex-1 flex-col">
+      <Box ms={{ xl: "72" }} minW="0">
         <AppHeader />
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-    </div>
+        <Box as="main" px={{ base: "3", md: "6" }} pt="4" pb="10">
+          {children}
+        </Box>
+      </Box>
+    </Box>
   )
 }

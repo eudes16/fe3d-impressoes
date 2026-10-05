@@ -1,8 +1,9 @@
-import { LogOut } from "lucide-react"
+import { eq } from "drizzle-orm"
 
+import { db } from "@/db"
+import { profiles } from "@/db/schema"
 import { createClient } from "@/lib/supabase/server"
-import { signOut } from "@/actions/auth"
-import { Button } from "@/components/ui/button"
+import { AppHeaderBar } from "@/components/app-header-bar"
 
 export async function AppHeader() {
   const supabase = await createClient()
@@ -10,17 +11,13 @@ export async function AppHeader() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  return (
-    <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm">
-      <span className="text-sm text-muted-foreground">
-        {user?.email ?? ""}
-      </span>
-      <form action={signOut}>
-        <Button type="submit" variant="ghost" size="sm">
-          <LogOut className="size-4" />
-          Sair
-        </Button>
-      </form>
-    </header>
-  )
+  const [profile] = user
+    ? await db
+        .select({ name: profiles.name })
+        .from(profiles)
+        .where(eq(profiles.id, user.id))
+        .limit(1)
+    : []
+
+  return <AppHeaderBar name={profile?.name ?? ""} email={user?.email ?? ""} />
 }
