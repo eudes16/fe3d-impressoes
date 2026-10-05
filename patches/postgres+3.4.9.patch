@@ -1,0 +1,78 @@
+diff --git a/node_modules/postgres/cf/src/connection.js b/node_modules/postgres/cf/src/connection.js
+index 8e79170..ebe07ec 100644
+--- a/node_modules/postgres/cf/src/connection.js
++++ b/node_modules/postgres/cf/src/connection.js
+@@ -172,11 +172,19 @@ function Connection(options, queues = {}, { onopen = noop, onend = noop, onclose
+         : (query = q, query.active = true)
+ 
+       build(q)
+-      return write(toBuffer(q))
++      const written = write(toBuffer(q))
++      // Patch local (porsager/postgres#1218): o hook de reserva do sql.begin
++      // precisa rodar sempre que a query foi escrita. Como último termo do &&
++      // ele era pulado quando o pipeline estava cheio (ou com max_pipeline: 0),
++      // e o BEGIN ficava numa conexão não reservada (UNSAFE_TRANSACTION).
++      if (q.options.onexecute) {
++        q.options.onexecute(connection)
++        return false
++      }
++      return written
+         && !q.describeFirst
+         && !q.cursorFn
+         && sent.length < max_pipeline
+-        && (!q.options.onexecute || q.options.onexecute(connection))
+     } catch (error) {
+       sent.length === 0 && write(Sync)
+       errored(error)
+diff --git a/node_modules/postgres/cjs/src/connection.js b/node_modules/postgres/cjs/src/connection.js
+index 07f6716..cf57c78 100644
+--- a/node_modules/postgres/cjs/src/connection.js
++++ b/node_modules/postgres/cjs/src/connection.js
+@@ -170,11 +170,19 @@ function Connection(options, queues = {}, { onopen = noop, onend = noop, onclose
+         : (query = q, query.active = true)
+ 
+       build(q)
+-      return write(toBuffer(q))
++      const written = write(toBuffer(q))
++      // Patch local (porsager/postgres#1218): o hook de reserva do sql.begin
++      // precisa rodar sempre que a query foi escrita. Como último termo do &&
++      // ele era pulado quando o pipeline estava cheio (ou com max_pipeline: 0),
++      // e o BEGIN ficava numa conexão não reservada (UNSAFE_TRANSACTION).
++      if (q.options.onexecute) {
++        q.options.onexecute(connection)
++        return false
++      }
++      return written
+         && !q.describeFirst
+         && !q.cursorFn
+         && sent.length < max_pipeline
+-        && (!q.options.onexecute || q.options.onexecute(connection))
+     } catch (error) {
+       sent.length === 0 && write(Sync)
+       errored(error)
+diff --git a/node_modules/postgres/src/connection.js b/node_modules/postgres/src/connection.js
+index 1b1cccd..aa9237c 100644
+--- a/node_modules/postgres/src/connection.js
++++ b/node_modules/postgres/src/connection.js
+@@ -170,11 +170,19 @@ function Connection(options, queues = {}, { onopen = noop, onend = noop, onclose
+         : (query = q, query.active = true)
+ 
+       build(q)
+-      return write(toBuffer(q))
++      const written = write(toBuffer(q))
++      // Patch local (porsager/postgres#1218): o hook de reserva do sql.begin
++      // precisa rodar sempre que a query foi escrita. Como último termo do &&
++      // ele era pulado quando o pipeline estava cheio (ou com max_pipeline: 0),
++      // e o BEGIN ficava numa conexão não reservada (UNSAFE_TRANSACTION).
++      if (q.options.onexecute) {
++        q.options.onexecute(connection)
++        return false
++      }
++      return written
+         && !q.describeFirst
+         && !q.cursorFn
+         && sent.length < max_pipeline
+-        && (!q.options.onexecute || q.options.onexecute(connection))
+     } catch (error) {
+       sent.length === 0 && write(Sync)
+       errored(error)
